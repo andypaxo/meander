@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
-						row[j] *= 10f;
+						row[j] *= 5f;
 					}
 				}
 				
@@ -162,16 +162,15 @@ public class MainActivity extends Activity {
 					for (int j = 0; j < 64; j++) {
 						float height = (float)Math.random() * 10f;
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), 0, 0,
-								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), 0, 1,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), 1, 0);
+								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
+								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), (i+1) / 64f, (j+0) / 64f,
+								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j+1], j+1), 0, 1,
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), 0, 0,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), 1, 0);
+								SimpleVector.create(i  , heightMap[i  ][j+1], j+1), (i+0) / 64f, (j+1) / 64f,
+								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
+								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
 					}
 				
-				terrain.calcTextureWrapSpherical();
 				terrain.setTexture("texture");
 				terrain.translate(-32, 0, -32);
 				terrain.strip();
@@ -179,10 +178,12 @@ public class MainActivity extends Activity {
 
 				world.addObject(terrain);
 
-				SimpleVector sv = new SimpleVector();
-				sv.set(terrain.getTransformedCenter());
-				sv.y -= 100;
-				sv.z -= 100;
+				Camera camera = world.getCamera();
+				camera.setPosition(0, -50, -20);
+				camera.lookAt(SimpleVector.create());
+//				camera.setFOVLimits(0.1f, 100f);
+				
+				SimpleVector sv = new SimpleVector(-50, -100, -30);
 				sun.setPosition(sv);
 				MemoryHelper.compact();
 
