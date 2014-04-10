@@ -50,6 +50,8 @@ public class MainActivity extends Activity {
 
 	private Light sun = null;
 	
+	private SimpleVector facing = new SimpleVector();
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);  
@@ -108,8 +110,11 @@ public class MainActivity extends Activity {
 			xpos = me.getX();
 			ypos = me.getY();
 
-			touchTurn = xd / -100f;
-			touchTurnUp = yd / -100f;
+			touchTurn = xd / 200f;
+			touchTurnUp = yd / -200f;
+			
+			facing.y += touchTurn;
+			facing.x += touchTurnUp;
 			return true;
 		}
 
@@ -168,14 +173,11 @@ public class MainActivity extends Activity {
 				
 				terrain.calcTextureWrapSpherical();
 				terrain.setTexture("texture");
+				terrain.translate(-32, 0, -32);
 				terrain.strip();
 				terrain.build();
 
 				world.addObject(terrain);
-
-				Camera cam = world.getCamera();
-				cam.moveCamera(Camera.CAMERA_MOVEOUT, 30);
-				cam.lookAt(terrain.getTransformedCenter());
 
 				SimpleVector sv = new SimpleVector();
 				sv.set(terrain.getTransformedCenter());
@@ -195,15 +197,25 @@ public class MainActivity extends Activity {
 		}
 
 		public void onDrawFrame(GL10 gl) {
-			if (touchTurn != 0) {
-				terrain.rotateY(touchTurn);
-				touchTurn = 0;
-			}
+			Camera camera = world.getCamera();
+			
+			camera.rotateAxis(camera.getYAxis(), touchTurn);
+			camera.rotateX(touchTurnUp);
 
-			if (touchTurnUp != 0) {
-				terrain.rotateX(touchTurnUp);
-				touchTurnUp = 0;
-			}
+			
+//			cam.setOrientation(SimpleVector.create(0, 0, 1), SimpleVector.create(0, 1, 0));
+//			cam.rotateCameraX(facing.x);
+//			cam.rotateCameraY(facing.y);
+						
+//			if (touchTurn != 0) {
+//				cam.rotateCameraY(touchTurn);
+//				touchTurn = 0;
+//			}
+//
+//			if (touchTurnUp != 0) {
+//				cam.rotateCameraX(touchTurnUp);
+//				touchTurnUp = 0;
+//			}
 
 			fb.clear(back);
 			world.renderScene(fb);
