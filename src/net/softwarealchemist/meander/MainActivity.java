@@ -18,6 +18,7 @@ import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
+import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
@@ -180,6 +181,16 @@ public class MainActivity extends Activity {
 								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
 					}
 				
+				for (int i = 0; i < 10; i++) {
+					SimpleVector position = SimpleVector.create((float)Math.random() * 62f + 1f, 0f, (float)Math.random() * 62f + 1f);
+					position.y = getHeightAtPoint(position) - 1f;
+					Object3D tower = Primitives.getBox(0.5f, 4f);
+					tower.translate(position);
+					tower.strip();
+					tower.build();
+					world.addObject(tower);
+				}
+				
 				terrain.setTexture("texture");
 				terrain.strip();
 				terrain.build();
@@ -221,13 +232,7 @@ public class MainActivity extends Activity {
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
 			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
-			int roundX = (int) Math.floor(position.x);
-			int roundZ = (int) Math.floor(position.z);
-			position.y = blerp(
-					position.x - roundX, position.z - roundZ,
-					heightMap[roundX][roundZ],   heightMap[roundX+1][roundZ],
-					heightMap[roundX][roundZ+1], heightMap[roundX+1][roundZ+1])
-					-1f;
+			position.y = getHeightAtPoint(position) - 1f;
 			camera.setPosition(position);
 
 			fb.clear(back);
@@ -241,6 +246,16 @@ public class MainActivity extends Activity {
 				time = System.currentTimeMillis();
 			}
 			fps++;
+		}
+
+		private float getHeightAtPoint(SimpleVector position) {
+			int roundX = (int) Math.floor(position.x);
+			int roundZ = (int) Math.floor(position.z);
+			float heightAtPoint = blerp(
+					position.x - roundX, position.z - roundZ,
+					heightMap[roundX][roundZ],   heightMap[roundX+1][roundZ],
+					heightMap[roundX][roundZ+1], heightMap[roundX+1][roundZ+1]);
+			return heightAtPoint;
 		}
 		
 		private float clamp(float value, float min, float max) {
