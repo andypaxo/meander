@@ -223,7 +223,13 @@ public class MainActivity extends Activity {
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
 			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
-			position.y = heightMap[(int) Math.floor(position.x)][(int) Math.floor(position.z)] - 1f;
+			int roundX = (int) Math.floor(position.x);
+			int roundZ = (int) Math.floor(position.z);
+			position.y = blerp(
+					position.x - roundX, position.z - roundZ,
+					heightMap[roundX][roundZ],   heightMap[roundX+1][roundZ],
+					heightMap[roundX][roundZ+1], heightMap[roundX+1][roundZ+1])
+					-1f;
 			camera.setPosition(position);
 
 			fb.clear(back);
@@ -242,5 +248,19 @@ public class MainActivity extends Activity {
 		private float clamp(float value, float min, float max) {
 			return Math.max(min, Math.min(max, value));
 		}
+		
+//		private float lerp(float a, float b, float t) {
+//			return a + (b - a) * t;
+//		}
+		
+		float blerp(
+				   float tx, float ty, 
+				   float c00, float c10,
+				   float c01, float c11)
+				{
+				    float a = c00 * (1f - tx) + c10 * tx;
+				    float b = c01 * (1f - tx) + c11 * tx;
+				    return a * (1f - ty) + b * ty;
+				}
 	}
 }
