@@ -7,6 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
+import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -55,6 +56,8 @@ public class MainActivity extends Activity {
 	private SimpleVector facing = new SimpleVector();
 
 	private boolean isWalking;
+	
+	private Rect worldBounds;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,14 +185,15 @@ public class MainActivity extends Activity {
 					}
 				
 				terrain.setTexture("texture");
-				terrain.translate(-32, 0, -32);
 				terrain.strip();
 				terrain.build();
 
 				world.addObject(terrain);
+				
+				worldBounds = new Rect(0, 0, 64, 64);
 
 				Camera camera = world.getCamera();
-				camera.setPosition(0, -5, -20);
+				camera.setPosition(20, -5, 20);
 				camera.lookAt(SimpleVector.create());
 				
 				SimpleVector sv = new SimpleVector(-50, -100, -30);
@@ -214,6 +218,11 @@ public class MainActivity extends Activity {
 
 			if (isWalking)
 				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
+			
+			SimpleVector position = camera.getPosition();
+			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
+			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
+			camera.setPosition(position);
 
 			fb.clear(back);
 			world.renderScene(fb);
@@ -226,6 +235,10 @@ public class MainActivity extends Activity {
 				time = System.currentTimeMillis();
 			}
 			fps++;
+		}
+		
+		private float clamp(float value, float min, float max) {
+			return Math.max(min, Math.min(max, value));
 		}
 	}
 }
