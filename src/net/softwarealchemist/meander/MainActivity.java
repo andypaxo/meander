@@ -10,8 +10,8 @@ import android.app.Activity;
 import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.Window;
 
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
@@ -61,7 +61,8 @@ public class MainActivity extends Activity {
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  
+        super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         create3DStuffs();
     }
     
@@ -74,11 +75,6 @@ public class MainActivity extends Activity {
 		renderer = new MyRenderer();
 		mGLView.setRenderer(renderer);
 		setContentView(mGLView);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
     }
     
     private void copy(Object src) {
@@ -174,7 +170,6 @@ public class MainActivity extends Activity {
 				
 				for (int i = 0; i < 64; i++)
 					for (int j = 0; j < 64; j++) {
-						float height = (float)Math.random() * 10f;
 						terrain.addTriangle(
 								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
 								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), (i+1) / 64f, (j+0) / 64f,
