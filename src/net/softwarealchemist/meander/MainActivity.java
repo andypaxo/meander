@@ -137,6 +137,7 @@ public class MainActivity extends Activity {
     class MyRenderer implements GLSurfaceView.Renderer {
 
 		private long time = System.currentTimeMillis();
+		private float[][] heightMap;
 
 		public MyRenderer() {
 		}
@@ -163,11 +164,11 @@ public class MainActivity extends Activity {
 				terrain = new Object3D(64 * 64 * 2);
 				HeightMapGenerator generator = new HeightMapGenerator();
 				generator.setGenerationSize(6);
-				float[][] heightMap = generator.generate();
+				heightMap = generator.generate();
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
-						row[j] *= 5f;
+						row[j] *= -5f;
 					}
 				}
 				
@@ -222,6 +223,7 @@ public class MainActivity extends Activity {
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
 			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
+			position.y = heightMap[(int) Math.floor(position.x)][(int) Math.floor(position.z)] - 1f;
 			camera.setPosition(position);
 
 			fb.clear(back);
