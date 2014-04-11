@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 
 	private float touchTurn = 0;
 	private float touchTurnUp = 0;
-
+	private float xAngle=0;
 	private float xpos = -1;
 	private float ypos = -1;
 	private float touchDrift = 0;
@@ -215,7 +215,10 @@ public class MainActivity extends Activity {
 			Camera camera = world.getCamera();
 			
 			camera.rotateAxis(camera.getYAxis(), touchTurn);
-			camera.rotateX(touchTurnUp);
+			if ((touchTurnUp > 0 && xAngle < Math.PI / 4.2) || (touchTurnUp < 0 && xAngle > -Math.PI / 4.2)) {
+				camera.rotateX(touchTurnUp);
+				xAngle += touchTurnUp;
+			}
 
 			if (isWalking)
 				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
