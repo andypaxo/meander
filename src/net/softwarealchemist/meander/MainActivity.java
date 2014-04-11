@@ -1,5 +1,7 @@
 package net.softwarealchemist.meander;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -7,15 +9,18 @@ import javax.microedition.khronos.opengles.GL10;
 
 import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
+import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
@@ -181,14 +186,30 @@ public class MainActivity extends Activity {
 								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
 					}
 				
-				for (int i = 0; i < 10; i++) {
-					SimpleVector position = SimpleVector.create((float)Math.random() * 62f + 1f, 0f, (float)Math.random() * 62f + 1f);
-					position.y = getHeightAtPoint(position) - 1f;
-					Object3D tower = Primitives.getBox(0.5f, 4f);
-					tower.translate(position);
-					tower.strip();
-					tower.build();
-					world.addObject(tower);
+				AssetManager assManager = getApplicationContext().getAssets();
+				
+				try {
+					InputStream objStream = assManager.open("models/LollypopTree.obj");
+					InputStream mtlStream = assManager.open("models/LollypopTree.mtl");
+					Object3D treeModel = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+					treeModel.rotateX((float) Math.PI);
+					
+					for (int i = 0; i < 10; i++) {
+						SimpleVector position = SimpleVector.create((float)Math.random() * 62f + 1f, 0f, (float)Math.random() * 62f + 1f);
+						position.y = getHeightAtPoint(position) - 1.5f;
+						Object3D tower = treeModel.cloneObject();
+						tower.translate(position);
+						tower.strip();
+						tower.build();
+						world.addObject(tower);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				for (String textureName : TextureManager.getInstance().getNames()) {
+					Log.d("meander", "Texture : " + textureName);
 				}
 				
 				terrain.setTexture("texture");
@@ -240,12 +261,12 @@ public class MainActivity extends Activity {
 			world.draw(fb);
 			fb.display();
 
-			if (System.currentTimeMillis() - time >= 1000) {
-				Logger.log(fps + "fps");
-				fps = 0;
-				time = System.currentTimeMillis();
-			}
-			fps++;
+//			if (System.currentTimeMillis() - time >= 1000) {
+//				Logger.log(fps + "fps");
+//				fps = 0;
+//				time = System.currentTimeMillis();
+//			}
+//			fps++;
 		}
 
 		private float getHeightAtPoint(SimpleVector position) {
