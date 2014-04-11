@@ -179,9 +179,8 @@ public class MainActivity extends Activity {
 				world.addObject(terrain);
 
 				Camera camera = world.getCamera();
-				camera.setPosition(0, -50, -20);
+				camera.setPosition(0, -5, -20);
 				camera.lookAt(SimpleVector.create());
-//				camera.setFOVLimits(0.1f, 100f);
 				
 				SimpleVector sv = new SimpleVector(-50, -100, -30);
 				sun.setPosition(sv);
@@ -203,20 +202,7 @@ public class MainActivity extends Activity {
 			camera.rotateAxis(camera.getYAxis(), touchTurn);
 			camera.rotateX(touchTurnUp);
 
-			
-//			cam.setOrientation(SimpleVector.create(0, 0, 1), SimpleVector.create(0, 1, 0));
-//			cam.rotateCameraX(facing.x);
-//			cam.rotateCameraY(facing.y);
-						
-//			if (touchTurn != 0) {
-//				cam.rotateCameraY(touchTurn);
-//				touchTurn = 0;
-//			}
-//
-//			if (touchTurnUp != 0) {
-//				cam.rotateCameraX(touchTurnUp);
-//				touchTurnUp = 0;
-//			}
+			camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
 
 			fb.clear(back);
 			world.renderScene(fb);
