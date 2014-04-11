@@ -191,7 +191,7 @@ public class MainActivity extends Activity {
 
 				world.addObject(terrain);
 				
-				worldBounds = new Rect(0, 0, 64, 64);
+				worldBounds = new Rect(1, 1, 63, 63);
 
 				Camera camera = world.getCamera();
 				camera.setPosition(20, -5, 20);
