@@ -180,16 +180,19 @@ public class MainActivity extends Activity {
 					}
 				}
 				
+				float uv;
 				for (int i = 0; i < 64; i++)
 					for (int j = 0; j < 64; j++) {
+						uv = (float) Math.random();
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), (i+1) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
+								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), uv, uv,
+								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), uv, uv,
+								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), uv, uv);
+						uv = (float) Math.random();
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j+1], j+1), (i+0) / 64f, (j+1) / 64f,
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
+								SimpleVector.create(i  , heightMap[i  ][j+1], j+1), uv, uv,
+								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), uv, uv,
+								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), uv, uv);
 					}
 				
 				try {
