@@ -9,6 +9,7 @@ import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 import com.threed.jpct.Camera;
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
 
 	private float xpos = -1;
 	private float ypos = -1;
+	private float touchDrift = 0;
 
 	private Object3D terrain = null;
 	private int fps = 0;
@@ -51,6 +53,8 @@ public class MainActivity extends Activity {
 	private Light sun = null;
 	
 	private SimpleVector facing = new SimpleVector();
+
+	private boolean isWalking;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,10 +100,14 @@ public class MainActivity extends Activity {
 		}
 
 		if (me.getAction() == MotionEvent.ACTION_UP) {
+			if (touchDrift < 15)
+				isWalking = !isWalking;
+			
 			xpos = -1;
 			ypos = -1;
 			touchTurn = 0;
 			touchTurnUp = 0;
+			touchDrift = 0;
 			return true;
 		}
 
@@ -109,6 +117,8 @@ public class MainActivity extends Activity {
 
 			xpos = me.getX();
 			ypos = me.getY();
+			
+			touchDrift += Math.abs(xd) + Math.abs(yd);
 
 			touchTurn = xd / 200f;
 			touchTurnUp = yd / -200f;
@@ -202,7 +212,8 @@ public class MainActivity extends Activity {
 			camera.rotateAxis(camera.getYAxis(), touchTurn);
 			camera.rotateX(touchTurnUp);
 
-			camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
+			if (isWalking)
+				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
 
 			fb.clear(back);
 			world.renderScene(fb);
