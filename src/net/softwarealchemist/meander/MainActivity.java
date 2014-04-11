@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.Window;
 
 import com.threed.jpct.Camera;
+import com.threed.jpct.Config;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Loader;
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
 	private boolean isWalking;
 	
 	private Rect worldBounds;
+	private final int worldScale = 10;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +157,7 @@ public class MainActivity extends Activity {
 
 				world = new World();
 				world.setAmbientLight(20, 20, 20);
+				worldBounds = new Rect(1 * worldScale, 1 * worldScale, 63 * worldScale, 63 * worldScale);
 
 				sun = new Light(world);
 				sun.setIntensity(250, 250, 250);
@@ -176,20 +179,23 @@ public class MainActivity extends Activity {
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
-						row[j] *= -5f;
+						row[j] *= -50f;
 					}
 				}
 				
+				int x, z, s = worldScale;
 				for (int i = 0; i < 64; i++)
 					for (int j = 0; j < 64; j++) {
+						x = i * s;
+						z = j * s;
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j  ], j  ), (i+1) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 16f, (j+0) / 16f,
+								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) / 16f, (j+0) / 16f,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 16f, (j+1) / 16f);
 						terrain.addTriangle(
-								SimpleVector.create(i  , heightMap[i  ][j+1], j+1), (i+0) / 64f, (j+1) / 64f,
-								SimpleVector.create(i  , heightMap[i  ][j  ], j  ), (i+0) / 64f, (j+0) / 64f,
-								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
+								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) / 16f, (j+1) / 16f,
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 16f, (j+0) / 16f,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 16f, (j+1) / 16f);
 					}
 				
 				try {
@@ -199,8 +205,8 @@ public class MainActivity extends Activity {
 					treeModel.setTexture("texture");
 					treeModel.rotateX((float) Math.PI);
 					
-					for (int i = 0; i < 10; i++) {
-						SimpleVector position = SimpleVector.create((float)Math.random() * 62f + 1f, 0f, (float)Math.random() * 62f + 1f);
+					for (int i = 0; i < 50; i++) {
+						SimpleVector position = SimpleVector.create((float)Math.random() * worldBounds.width() + worldBounds.left, 0f, (float)Math.random() * worldBounds.height() + worldBounds.top);
 						position.y = getHeightAtPoint(position) - 1.5f;
 						Object3D tower = treeModel.cloneObject();
 						tower.translate(position);
@@ -223,12 +229,10 @@ public class MainActivity extends Activity {
 
 				world.addObject(terrain);
 				
-				worldBounds = new Rect(1, 1, 63, 63);
-
 				Camera camera = world.getCamera();
 				camera.setPosition(20, -5, 20);
 				camera.lookAt(SimpleVector.create());
-				
+								
 				SimpleVector sv = new SimpleVector(-50, -100, -30);
 				sun.setPosition(sv);
 				MemoryHelper.compact();
@@ -258,7 +262,7 @@ public class MainActivity extends Activity {
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
 			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
-			position.y = getHeightAtPoint(position) - 1f;
+			position.y = getHeightAtPoint(position) - 2f;
 			camera.setPosition(position);
 
 			fb.clear(back);
@@ -274,7 +278,9 @@ public class MainActivity extends Activity {
 //			fps++;
 		}
 
-		private float getHeightAtPoint(SimpleVector position) {
+		private float getHeightAtPoint(SimpleVector targetPosition) {
+			SimpleVector position = SimpleVector.create(targetPosition);
+			position.scalarMul(1f / worldScale);
 			int roundX = (int) Math.floor(position.x);
 			int roundZ = (int) Math.floor(position.z);
 			float heightAtPoint = blerp(
