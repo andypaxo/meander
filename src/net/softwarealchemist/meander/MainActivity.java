@@ -11,6 +11,7 @@ import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -157,11 +158,16 @@ public class MainActivity extends Activity {
 
 				sun = new Light(world);
 				sun.setIntensity(250, 250, 250);
-
-				// Create a texture out of the icon...:-)
-				Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
-				TextureManager.getInstance().addTexture("texture", texture);
-
+				
+				AssetManager assManager = getApplicationContext().getAssets();
+				try {
+					Drawable textureImage = Drawable.createFromStream(assManager.open("textures/leaves.jpg"), null);
+					Texture texture = new Texture(BitmapHelper.convert(textureImage));
+					TextureManager.getInstance().addTexture("texture", texture);
+				} catch (IOException e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
 				//cube = Primitives.getCube(10);
 				terrain = new Object3D(64 * 64 * 2);
 				HeightMapGenerator generator = new HeightMapGenerator();
@@ -186,12 +192,11 @@ public class MainActivity extends Activity {
 								SimpleVector.create(i+1, heightMap[i+1][j+1], j+1), (i+1) / 64f, (j+1) / 64f);
 					}
 				
-				AssetManager assManager = getApplicationContext().getAssets();
-				
 				try {
 					InputStream objStream = assManager.open("models/LollypopTree.obj");
 					InputStream mtlStream = assManager.open("models/LollypopTree.mtl");
 					Object3D treeModel = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+					treeModel.setTexture("texture");
 					treeModel.rotateX((float) Math.PI);
 					
 					for (int i = 0; i < 10; i++) {
