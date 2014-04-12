@@ -189,13 +189,13 @@ public class MainActivity extends Activity {
 						x = i * s;
 						z = j * s;
 						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 16f, (j+0) / 16f,
-								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) / 16f, (j+0) / 16f,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 16f, (j+1) / 16f);
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
+								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) / 8f, (j+0) / 8f,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
 						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) / 16f, (j+1) / 16f,
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 16f, (j+0) / 16f,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 16f, (j+1) / 16f);
+								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) / 8f, (j+1) / 8f,
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
 					}
 				
 				try {
