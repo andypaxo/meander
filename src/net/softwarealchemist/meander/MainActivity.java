@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
 import android.content.res.AssetManager;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
@@ -66,6 +67,8 @@ public class MainActivity extends Activity {
 	
 	private Rect worldBounds;
 	private final int worldScale = 10;
+	
+	private Object3D[] mushrooms;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,7 +218,7 @@ public class MainActivity extends Activity {
 					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
 					model.setTexture("mushroom");
 					model.rotateX((float) Math.PI);					
-					placeModel(model, -1.6f, 10, 5);
+					mushrooms = placeModel(model, -1.6f, 10, 5);
 					
 					objStream= assManager.open("models/Well.obj");
 					mtlStream = assManager.open("models/Well.mtl");
@@ -236,7 +239,7 @@ public class MainActivity extends Activity {
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(20, -5, 20);
-				camera.lookAt(SimpleVector.create());
+				camera.lookAt(SimpleVector.create(worldBounds.exactCenterX(), 0, worldBounds.exactCenterY()));
 								
 				SimpleVector sv = new SimpleVector(-50, -100, -30);
 				sun.setPosition(sv);
@@ -249,7 +252,8 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		private void placeModel(Object3D model, float offset, int numClumps, int clumpSize) {
+		private Object3D[] placeModel(Object3D model, float offset, int numClumps, int clumpSize) {
+			Object3D[] result = new Object3D[numClumps * clumpSize];
 			SimpleVector instancePosition = new SimpleVector();
 			final int clumpRadius = 1 * worldScale;
 			Rect bounds = new Rect(worldBounds);
@@ -271,8 +275,10 @@ public class MainActivity extends Activity {
 					instance.strip();
 					instance.build();
 					world.addObject(instance);
+					result[i * clumpSize + c] = instance;
 				}
 			}
+			return result;
 		}
 
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -295,6 +301,19 @@ public class MainActivity extends Activity {
 			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
 			position.y = getHeightAtPoint(position) - 2f;
 			camera.setPosition(position);
+			
+			Object3D mushroom;
+			SimpleVector toCam;
+			SimpleVector mushroomTranslation;
+			for (int i = 0; i < mushrooms.length; i++) {
+				mushroom = mushrooms[i];
+				mushroomTranslation = mushroom.getTranslation();
+				toCam = SimpleVector.create(mushroomTranslation);
+				toCam.sub(camera.getPosition());
+				if (toCam.length() < worldScale) {
+					mushroom.translate(0, 0.2f, 0);
+				}
+			}
 
 			fb.clear(back);
 			world.renderScene(fb);
