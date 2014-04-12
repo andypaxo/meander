@@ -56,7 +56,6 @@ public class MainActivity extends Activity {
 	private float ypos = -1;
 	private float touchDrift = 0;
 
-	private Object3D terrain = null;
 	private int fps = 0;
 
 	private Light sun = null;
@@ -171,21 +170,20 @@ public class MainActivity extends Activity {
 					// TODO: handle exception
 					e.printStackTrace();
 				}
-				//cube = Primitives.getCube(10);
-				terrain = new Object3D(64 * 64 * 2);
+
 				HeightMapGenerator generator = new HeightMapGenerator();
-				generator.setGenerationSize(6);
-				heightMap = generator.generate();
+				heightMap = generator.generate(0, 0, 64, 64, 0.03f);
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
-						row[j] *= -50f;
+						row[j] *= -30f;
 					}
 				}
-				
+
+				Object3D terrain = new Object3D(64 * 64 * 2);				
 				int x, z, s = worldScale;
-				for (int i = 0; i < 64; i++)
-					for (int j = 0; j < 64; j++) {
+				for (int i = 0; i < 62; i++)
+					for (int j = 0; j < 62; j++) {
 						x = i * s;
 						z = j * s;
 						terrain.addTriangle(
@@ -197,6 +195,10 @@ public class MainActivity extends Activity {
 								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
 								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
 					}
+				terrain.setTexture("texture");
+				terrain.strip();
+				terrain.build();
+				world.addObject(terrain);
 				
 				try {
 					InputStream objStream = assManager.open("models/LollypopTree.obj");
@@ -223,11 +225,6 @@ public class MainActivity extends Activity {
 					Log.d("meander", "Texture : " + textureName);
 				}
 				
-				terrain.setTexture("texture");
-				terrain.strip();
-				terrain.build();
-
-				world.addObject(terrain);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(20, -5, 20);

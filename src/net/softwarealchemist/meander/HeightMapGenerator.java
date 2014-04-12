@@ -1,224 +1,140 @@
 package net.softwarealchemist.meander;
-/**
-Copyright (c) 2012, Kevin Sacro
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
-**/
-
 import java.util.Arrays;
 
+import android.util.Log;
 
-/**
-* Uses the Diamond-Square Algorithm to generate height map data. Generated
-* data is returned in a 2D array of floats.
-* 
-* @author Kevin Sacro
-*/
 public class HeightMapGenerator {
-
-       // the generated map's height and width will be equal to gensize
-       private int gensize;
-       private int width;
-       private int height;
-       private float variance;
        
-       /**
-        * Lone constructor.
-        */
-       public HeightMapGenerator(){
-               
-               gensize = (int)Math.pow(2, 9) + 1;
-               width = gensize;
-               height = gensize;
-               variance = 1;
+       public float[][] generate(int offsetX, int offsetY, int sizeX, int sizeY, float scale) {
+    	   int octaves = 3;
+    	   float[][] result = new float[sizeX][sizeY];
+    	   for (int octave = 0; octave < octaves; octave++) {
+    		   Log.d("wander", "------------produced octave " + octave);
+	    	   for (int x = 0; x < sizeX; x++)
+	    		   for (int y = 0; y < sizeY; y++) 
+	    			   result[x][y] += (noise((x + offsetX) * scale, (y + offsetY) * scale) - 0.5f) * (1f / (octave+1));
+	    	   scale *= 2f;
+    	   }
+    	   return result;
        }
        
-       /**
-        * Adjusts the height map dimensions.
-        * @param width - The desired width (in pixels) of generated maps.
-        * @param height - The desired height (in pixels) of generated maps.
-        */
-       public void setSize(int width, int height){
-               
-               this.width = width;
-               this.height = height;
-               
-               // gensize must be in the form 2^n + 1 and
-               // also be greater or equal to both the width
-               // and height
-               float w = (float)Math.ceil(Math.log(width)/Math.log(2));
-               float h = (float)Math.ceil(Math.log(height)/Math.log(2));
-               
-               if(w > h){
-                       gensize = (int)Math.pow(2, w) + 1;
-               }
-               else{
-                       gensize = (int)Math.pow(2, h) + 1;
-               }
-       }
+       private static short p[] = {151,160,137,91,90,15,
+    	   131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+    	   190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
+    	   88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
+    	   77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,
+    	   102,143,54, 65,25,63,161, 1,216,80,73,209,76,132,187,208, 89,18,169,200,196,
+    	   135,130,116,188,159,86,164,100,109,198,173,186, 3,64,52,217,226,250,124,123,
+    	   5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,
+    	   223,183,170,213,119,248,152, 2,44,154,163, 70,221,153,101,155,167, 43,172,9,
+    	   129,22,39,253, 19,98,108,110,79,113,224,232,178,185, 112,104,218,246,97,228,
+    	   251,34,242,193,238,210,144,12,191,179,162,241, 81,51,145,235,249,14,239,107,
+    	   49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
+    	   138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
+    	   // To remove the need for index wrapping, float the permutation table length
+    	   private static short perm[] = new short[512];
+    	   private static short permMod12[] = new short[512];
+    	   static {
+    	     for(int i=0; i<512; i++)
+    	     {
+    	       perm[i]=p[i & 255];
+    	       permMod12[i] = (short)(perm[i] % 12);
+    	     }
+    	   }
 
+
+       // Skewing and un-skewing factors 
+       private static final float F2 = (float) (0.5f*(Math.sqrt(3.0f)-1.0f));
+       private static final float G2 = (float) ((3.0f-Math.sqrt(3.0f))/6.0f);
        
-       /**
-        * Adjusts the height map dimensions.
-        * @param n - Sets the width and height of generated maps to be 2^n + 1 pixels.
-        */
-       public void setGenerationSize(int n){
-               
-               gensize = (int)Math.pow(2, n) + 1;
-               width = gensize;
-               height = gensize;
-       }
+       private static Grad grad3[] = {new Grad(1,1,0),new Grad(-1,1,0),new Grad(1,-1,0),new Grad(-1,-1,0),
+           new Grad(1,0,1),new Grad(-1,0,1),new Grad(1,0,-1),new Grad(-1,0,-1),
+           new Grad(0,1,1),new Grad(0,-1,1),new Grad(0,1,-1),new Grad(0,-1,-1)};
        
-       /**
-        * @param v - The higher the variance, the rougher
-        * the height map. By default it is 1.
-        */
-       public void setVariance(float v){
-               variance = v;
+       // This method is a *lot* faster than using (int)Math.floor(x)
+       private static int fastfloor(float x) {
+         int xi = (int)x;
+         return x<xi ? xi-1 : xi;
        }
        
-       /**
-        * Generates height map data and places it in a 
-        * 2D array. A new height map is created everytime
-        * generate() is called.
-        * 
-        * @return A 2D array containing height map data.
-        */
-       public float[][] generate() {
-
-               float[][] map = new float[gensize][gensize];
-
-               // Place initial seeds for corners
-               map[0][0] = (float)Math.random();
-               map[0][map.length - 1] = (float)Math.random();
-               map[map.length - 1][0] = (float)Math.random();
-               map[map.length - 1][map.length - 1] = (float)Math.random();
-
-               map = generate(map);
-               
-               if(width < gensize || height < gensize){
-                       
-                       float[][] temp = new float[width][height];
-                       
-                       for(int i = 0; i < temp.length; i++){
-                               temp[i] = Arrays.copyOf(map[i], temp[i].length);
-                       }
-                       
-                       map = temp;
-                       
-               }
-               
-               return map;
-
+       private static float dot(Grad g, float x, float y) {
+    	    return g.x*x + g.y*y;
        }
        
-       /**
-        * Fills the specified 2D array with height map data and returns it.
-        * Any index whose value is not 0 will not be overwritten and used
-        * during procedural generation. This makes this method ideal for
-        * pre-seeding data to generate maps with specific features.
-        * 
-        * @param map - 2D array containing height map data
-        * 
-        * @return A 2D array containing height map data.
-        */
-       public float[][] generate(float[][] map){
-               
-               map = map.clone();
-               int step = map.length - 1;
-
-               float v = variance;
-               
-               while(step > 1){
-
-                       // SQUARE STEP
-                       for(int i = 0; i < map.length - 1; i += step){
-                               for(int j = 0; j < map[i].length - 1; j += step){
-
-                                       float average = (map[i][j] + map[i + step][j] + map[i][j + step] + map[i+step][j+step])/4;
-
-                                       if(map[i + step/2][j + step/2] == 0) // check if not pre-seeded
-                                               map[i + step/2][j + step/2] = average + randVariance(v);
-
-                               }       
-                       }
-
-                       // DIAMOND STEP
-                       for(int i = 0; i < map.length - 1; i += step){
-                               for(int j = 0; j < map[i].length - 1; j += step){
-
-                                       if(map[i + step/2][j] == 0) // check if not pre-seeded
-                                               map[i + step/2][j] = averageDiamond(map, i + step/2, j, step) + randVariance(v);
-
-                                       if(map[i][j + step/2] == 0)
-                                               map[i][j + step/2] = averageDiamond(map, i, j + step/2, step) + randVariance(v);
-
-                                       if(map[i + step][j + step/2] == 0)
-                                               map[i + step][j + step/2] = averageDiamond(map, i + step, j + step/2, step) + randVariance(v);
-
-                                       if(map[i + step/2][j + step] == 0)
-                                               map[i + step/2][j + step] = averageDiamond(map, i + step/2, j + step, step) + randVariance(v);
-
-                               }       
-                       }
-
-                       v /=2;
-                       step /= 2;
-               }
-               
-               return map;
+       // 2D simplex noise
+       public static float noise(float xin, float yin) {
+         float n0, n1, n2; // Noise contributions from the three corners
+         // Skew the input space to determine which simplex cell we're in
+         float s = (xin+yin)*F2; // Hairy factor for 2D
+         int i = fastfloor(xin+s);
+         int j = fastfloor(yin+s);
+         float t = (i+j)*G2;
+         float X0 = i-t; // Unskew the cell origin back to (x,y) space
+         float Y0 = j-t;
+         float x0 = xin-X0; // The x,y distances from the cell origin
+         float y0 = yin-Y0;
+         // For the 2D case, the simplex shape is an equilateral triangle.
+         // Determine which simplex we are in.
+         int i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+         if(x0>y0) {i1=1; j1=0;} // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+         else {i1=0; j1=1;}      // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+         // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+         // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+         // c = (3-sqrt(3))/6
+         float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
+         float y1 = y0 - j1 + G2;
+         float x2 = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
+         float y2 = y0 - 1.0f + 2.0f * G2;
+         // Work out the hashed gradient indices of the three simplex corners
+         int ii = i & 255;
+         int jj = j & 255;
+         int gi0 = permMod12[ii+perm[jj]];
+         int gi1 = permMod12[ii+i1+perm[jj+j1]];
+         int gi2 = permMod12[ii+1+perm[jj+1]];
+         // Calculate the contribution from the three corners
+         float t0 = 0.5f - x0*x0-y0*y0;
+         if(t0<0) n0 = 0.0f;
+         else {
+           t0 *= t0;
+           n0 = t0 * t0 * dot(grad3[gi0], x0, y0);  // (x,y) of grad3 used for 2D gradient
+         }
+         float t1 = 0.5f - x1*x1-y1*y1;
+         if(t1<0) n1 = 0.0f;
+         else {
+           t1 *= t1;
+           n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
+         }
+         float t2 = 0.5f - x2*x2-y2*y2;
+         if(t2<0) n2 = 0.0f;
+         else {
+           t2 *= t2;
+           n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
+         }
+         // Add contributions from each corner to get the final noise value.
+         // The result is scaled to return values in the interval [-1,1].
+         return 70.0f * (n0 + n1 + n2);
        }
+       
+    // Inner class to speed upp gradient computations
+       // (array access is a lot slower than member access)
+       private static class Grad
+       {
+         float x, y, z, w;
 
-       private float averageDiamond(float[][] map, int x, int y, int step){
+         Grad(float x, float y, float z)
+         {
+           this.x = x;
+           this.y = y;
+           this.z = z;
+         }
 
-               int count = 0;
-               float average = 0;
-
-               if(x - step/2 >= 0){
-                       count++;
-                       average += map[x - step/2][y];
-               }
-
-               if(x + step/2 < map.length){
-                       count++;
-                       average += map[x + step/2][y];
-               }
-
-               if(y - step/2 >= 0){
-                       count++;
-                       average += map[x][y - step/2];
-               }
-
-               if(y + step/2 < map.length){
-                       count++;
-                       average += map[x][y + step/2];
-               }
-
-               return average/count;
-       }
-
-       private float randVariance(float v){
-               return (float)Math.random()*2*v - v;
+         Grad(float x, float y, float z, float w)
+         {
+           this.x = x;
+           this.y = y;
+           this.z = z;
+           this.w = w;
+         }
        }
 
 }
