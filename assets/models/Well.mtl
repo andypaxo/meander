@@ -1,0 +1,10 @@
+#Materials exported from Google Sketchup
+
+newmtl _main_Textures004_png
+   Ka 0.000000 0.000000 0.000000
+   Kd   1.0000   1.0000   1.0000
+   Tr 1.0
+   Ks 0.000000 0.000000 0.000000
+   Ns   3.2000
+   mapKd Textures004.png
+

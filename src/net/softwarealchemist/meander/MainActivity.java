@@ -166,6 +166,10 @@ public class MainActivity extends Activity {
 					Drawable textureImage = Drawable.createFromStream(assManager.open("textures/leaves.jpg"), null);
 					Texture texture = new Texture(BitmapHelper.convert(textureImage));
 					TextureManager.getInstance().addTexture("texture", texture);
+
+					textureImage = Drawable.createFromStream(assManager.open("textures/mushroom.jpg"), null);
+					texture = new Texture(BitmapHelper.convert(textureImage));
+					TextureManager.getInstance().addTexture("mushroom", texture);
 				} catch (IOException e) {
 					// TODO: handle exception
 					e.printStackTrace();
@@ -201,21 +205,23 @@ public class MainActivity extends Activity {
 				world.addObject(terrain);
 				
 				try {
-					InputStream objStream = assManager.open("models/LollypopTree.obj");
-					InputStream mtlStream = assManager.open("models/LollypopTree.mtl");
-					Object3D treeModel = Loader.loadOBJ(objStream, mtlStream, 1)[0];
-					treeModel.setTexture("texture");
-					treeModel.rotateX((float) Math.PI);
+					InputStream objStream, mtlStream;
+					Object3D model;
+
+					objStream= assManager.open("models/LollypopTree.obj");
+					mtlStream = assManager.open("models/LollypopTree.mtl");
+					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+					model.setTexture("mushroom");
+					model.rotateX((float) Math.PI);					
+					placeModel(model, -1.6f, 10, 5);
 					
-					for (int i = 0; i < 50; i++) {
-						SimpleVector position = SimpleVector.create((float)Math.random() * worldBounds.width() + worldBounds.left, 0f, (float)Math.random() * worldBounds.height() + worldBounds.top);
-						position.y = getHeightAtPoint(position) - 1.5f;
-						Object3D tower = treeModel.cloneObject();
-						tower.translate(position);
-						tower.strip();
-						tower.build();
-						world.addObject(tower);
-					}
+					objStream= assManager.open("models/Well.obj");
+					mtlStream = assManager.open("models/Well.mtl");
+					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+					model.setTexture("mushroom");
+					model.scale(5f);
+					model.rotateX((float) Math.PI);
+					placeModel(model, -1f, 10, 1);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -237,6 +243,32 @@ public class MainActivity extends Activity {
 				if (master == null) {
 					Logger.log("Saving master Activity!");
 					master = MainActivity.this;
+				}
+			}
+		}
+
+		private void placeModel(Object3D model, float offset, int numClumps, int clumpSize) {
+			SimpleVector instancePosition = new SimpleVector();
+			final int clumpRadius = 1 * worldScale;
+			Rect bounds = new Rect(worldBounds);
+			bounds.inset(clumpRadius, clumpRadius);
+			
+			for (int i = 0; i < numClumps; i++) {
+				SimpleVector position = SimpleVector.create(
+						(float)Math.random() * bounds.width() + bounds.left,
+						0f,
+						(float)Math.random() * bounds.height() + bounds.top);
+				for (int c = 0; c < clumpSize; c++) {
+					instancePosition.set(position);
+					instancePosition.x += ((float)Math.random() - 0.5) * clumpRadius * 2;
+					instancePosition.z += ((float)Math.random() - 0.5) * clumpRadius * 2;
+					instancePosition.y = getHeightAtPoint(instancePosition) + offset;
+					
+					Object3D instance = model.cloneObject();
+					instance.translate(instancePosition);
+					instance.strip();
+					instance.build();
+					world.addObject(instance);
 				}
 			}
 		}
