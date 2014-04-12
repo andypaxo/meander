@@ -156,6 +156,8 @@ public class MainActivity extends Activity {
 
 				world = new World();
 				world.setAmbientLight(20, 20, 20);
+				world.setFogging(World.FOGGING_ENABLED);
+				world.setFogParameters(20 * worldScale, 50, 50, 100);
 				worldBounds = new Rect(1 * worldScale, 1 * worldScale, 63 * worldScale, 63 * worldScale);
 
 				sun = new Light(world);
