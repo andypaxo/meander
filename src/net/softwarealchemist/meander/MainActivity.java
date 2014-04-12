@@ -158,13 +158,16 @@ public class MainActivity extends Activity {
 			if (master == null) {
 
 				world = new World();
-				world.setAmbientLight(20, 20, 20);
+				world.setAmbientLight(100, 100, 130);
 				world.setFogging(World.FOGGING_ENABLED);
 				world.setFogParameters(20 * worldScale, 50, 50, 100);
 				worldBounds = new Rect(1 * worldScale, 1 * worldScale, 63 * worldScale, 63 * worldScale);
+				world.setClippingPlanes(1f, 32f * worldScale);
 
 				sun = new Light(world);
 				sun.setIntensity(250, 250, 250);
+				SimpleVector sv = new SimpleVector(-50, -200, -30);
+				sun.setPosition(sv);
 				
 				AssetManager assManager = getApplicationContext().getAssets();
 				try {
@@ -227,6 +230,11 @@ public class MainActivity extends Activity {
 					model.scale(5f);
 					model.rotateX((float) Math.PI);
 					placeModel(model, -1f, 10, 1);
+					
+					model = Primitives.getPlane(1, 3f);
+					model.setBillboarding(Object3D.BILLBOARDING_ENABLED);
+					model.setTexture("mushroom");
+					placeModel(model, -1f, 20, 6);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -240,9 +248,7 @@ public class MainActivity extends Activity {
 				Camera camera = world.getCamera();
 				camera.setPosition(20, -5, 20);
 				camera.lookAt(SimpleVector.create(worldBounds.exactCenterX(), 0, worldBounds.exactCenterY()));
-								
-				SimpleVector sv = new SimpleVector(-50, -100, -30);
-				sun.setPosition(sv);
+				
 				MemoryHelper.compact();
 
 				if (master == null) {
