@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
 
 	private float touchTurn = 0;
 	private float touchTurnUp = 0;
-	private float xAngle=0;
+	private float xAngle = 0;
 	private float xpos = -1;
 	private float ypos = -1;
 	private float touchDrift = 0;
@@ -154,6 +154,7 @@ public class MainActivity extends Activity {
 				fb.dispose();
 			}
 			fb = new FrameBuffer(gl, w, h);
+			Log.d("meander", "Using GLES v" + fb.getOpenGLMajorVersion());
 
 			if (master == null) {
 
@@ -162,7 +163,7 @@ public class MainActivity extends Activity {
 				world.setFogging(World.FOGGING_ENABLED);
 				world.setFogParameters(20 * worldScale, 50, 50, 100);
 				worldBounds = new Rect(1 * worldScale, 1 * worldScale, 63 * worldScale, 63 * worldScale);
-				world.setClippingPlanes(1f, 32f * worldScale);
+				world.setClippingPlanes(1f, 20f * worldScale);
 
 				sun = new Light(world);
 				sun.setIntensity(250, 250, 250);
@@ -174,6 +175,8 @@ public class MainActivity extends Activity {
 				Texture texture;
 				loadTexture(assManager, "textures/leaves.jpg", "texture");
 				loadTexture(assManager, "textures/rune-rock.png", "rune-rock");
+				loadTexture(assManager, "textures/gnarly-tree.png", "gnarly-tree");
+				loadTexture(assManager, "textures/pine-tree.png", "pine-tree");
 				
 
 				HeightMapGenerator generator = new HeightMapGenerator();
@@ -206,34 +209,19 @@ public class MainActivity extends Activity {
 				world.addObject(terrain);
 				
 				try {
-					InputStream objStream, mtlStream;
 					Object3D model;
 
-//					objStream= assManager.open("models/LollypopTree.obj");
-//					mtlStream = assManager.open("models/LollypopTree.mtl");
-//					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
-//					model.setTexture("mushroom");
-//					model.rotateX((float) Math.PI);					
-//					mushrooms = placeModel(model, -1.6f, 10, 5);
-//					
-//					objStream= assManager.open("models/Well.obj");
-//					mtlStream = assManager.open("models/Well.mtl");
-//					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
-//					model.setTexture("mushroom");
-//					model.scale(5f);
-//					model.rotateX((float) Math.PI);
-//					placeModel(model, -1f, 10, 1);
-//					
-//					model = Primitives.getPlane(1, 3f);
-//					model.setBillboarding(Object3D.BILLBOARDING_ENABLED);
-//					model.setTexture("mushroom");
-//					placeModel(model, -1f, 20, 6);
-					
-					objStream= assManager.open("models/rune-rock.obj");
-					mtlStream = assManager.open("models/rune-rock.mtl");
-					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+					model = loadModel(assManager, "rune-rock");
 					model.setTexture("rune-rock");
-					placeModel(model, 0, 100, 1);
+					placeModel(model, 0, 40, 1);
+
+					model = loadModel(assManager, "gnarly-tree");
+					model.setTexture("gnarly-tree");
+					placeModel(model, 0, 30, 3);
+					
+					model = loadModel(assManager, "pine-tree");
+					model.setTexture("pine-tree");
+					placeModel(model, 0, 40, 4);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -257,12 +245,20 @@ public class MainActivity extends Activity {
 			}
 		}
 
+		private Object3D loadModel(AssetManager assManager, String modelName) throws IOException {
+			Object3D model;
+			InputStream objStream, mtlStream;
+			objStream= assManager.open("models/"+modelName+".obj");
+			mtlStream = assManager.open("models/"+modelName+".mtl");
+			model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+			return model;
+		}
+
 		Drawable textureImage;
 		Texture texture;
 		private void loadTexture(AssetManager assManager, String path, String textureName) {
 			try {
-				textureImage = Drawable.createFromStream(assManager.open(path), null);
-				texture = new Texture(BitmapHelper.convert(textureImage));
+				texture = new Texture(assManager.open(path), true);
 				TextureManager.getInstance().addTexture(textureName, texture);
 			} catch (IOException e) {
 				// TODO: handle exception
@@ -289,6 +285,7 @@ public class MainActivity extends Activity {
 					instancePosition.y = getHeightAtPoint(instancePosition) + offset;
 					
 					Object3D instance = model.cloneObject();
+					instance.rotateY((float) (Math.random() * 2.0 * Math.PI));
 					instance.translate(instancePosition);
 					instance.strip();
 					instance.build();
