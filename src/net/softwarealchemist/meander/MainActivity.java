@@ -170,18 +170,11 @@ public class MainActivity extends Activity {
 				sun.setPosition(sv);
 				
 				AssetManager assManager = getApplicationContext().getAssets();
-				try {
-					Drawable textureImage = Drawable.createFromStream(assManager.open("textures/leaves.jpg"), null);
-					Texture texture = new Texture(BitmapHelper.convert(textureImage));
-					TextureManager.getInstance().addTexture("texture", texture);
-
-					textureImage = Drawable.createFromStream(assManager.open("textures/mushroom.jpg"), null);
-					texture = new Texture(BitmapHelper.convert(textureImage));
-					TextureManager.getInstance().addTexture("mushroom", texture);
-				} catch (IOException e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				}
+				Drawable textureImage;
+				Texture texture;
+				loadTexture(assManager, "textures/leaves.jpg", "texture");
+				loadTexture(assManager, "textures/rune-rock.png", "rune-rock");
+				
 
 				HeightMapGenerator generator = new HeightMapGenerator();
 				heightMap = generator.generate(0, 0, 64, 64, 0.03f);
@@ -216,25 +209,31 @@ public class MainActivity extends Activity {
 					InputStream objStream, mtlStream;
 					Object3D model;
 
-					objStream= assManager.open("models/LollypopTree.obj");
-					mtlStream = assManager.open("models/LollypopTree.mtl");
-					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
-					model.setTexture("mushroom");
-					model.rotateX((float) Math.PI);					
-					mushrooms = placeModel(model, -1.6f, 10, 5);
+//					objStream= assManager.open("models/LollypopTree.obj");
+//					mtlStream = assManager.open("models/LollypopTree.mtl");
+//					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+//					model.setTexture("mushroom");
+//					model.rotateX((float) Math.PI);					
+//					mushrooms = placeModel(model, -1.6f, 10, 5);
+//					
+//					objStream= assManager.open("models/Well.obj");
+//					mtlStream = assManager.open("models/Well.mtl");
+//					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+//					model.setTexture("mushroom");
+//					model.scale(5f);
+//					model.rotateX((float) Math.PI);
+//					placeModel(model, -1f, 10, 1);
+//					
+//					model = Primitives.getPlane(1, 3f);
+//					model.setBillboarding(Object3D.BILLBOARDING_ENABLED);
+//					model.setTexture("mushroom");
+//					placeModel(model, -1f, 20, 6);
 					
-					objStream= assManager.open("models/Well.obj");
-					mtlStream = assManager.open("models/Well.mtl");
+					objStream= assManager.open("models/rune-rock.obj");
+					mtlStream = assManager.open("models/rune-rock.mtl");
 					model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
-					model.setTexture("mushroom");
-					model.scale(5f);
-					model.rotateX((float) Math.PI);
-					placeModel(model, -1f, 10, 1);
-					
-					model = Primitives.getPlane(1, 3f);
-					model.setBillboarding(Object3D.BILLBOARDING_ENABLED);
-					model.setTexture("mushroom");
-					placeModel(model, -1f, 20, 6);
+					model.setTexture("rune-rock");
+					placeModel(model, 0, 100, 1);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -255,6 +254,19 @@ public class MainActivity extends Activity {
 					Logger.log("Saving master Activity!");
 					master = MainActivity.this;
 				}
+			}
+		}
+
+		Drawable textureImage;
+		Texture texture;
+		private void loadTexture(AssetManager assManager, String path, String textureName) {
+			try {
+				textureImage = Drawable.createFromStream(assManager.open(path), null);
+				texture = new Texture(BitmapHelper.convert(textureImage));
+				TextureManager.getInstance().addTexture(textureName, texture);
+			} catch (IOException e) {
+				// TODO: handle exception
+				e.printStackTrace();
 			}
 		}
 
@@ -308,18 +320,18 @@ public class MainActivity extends Activity {
 			position.y = getHeightAtPoint(position) - 2f;
 			camera.setPosition(position);
 			
-			Object3D mushroom;
-			SimpleVector toCam;
-			SimpleVector mushroomTranslation;
-			for (int i = 0; i < mushrooms.length; i++) {
-				mushroom = mushrooms[i];
-				mushroomTranslation = mushroom.getTranslation();
-				toCam = SimpleVector.create(mushroomTranslation);
-				toCam.sub(camera.getPosition());
-				if (toCam.length() < worldScale) {
-					mushroom.translate(0, 0.2f, 0);
-				}
-			}
+//			Object3D mushroom;
+//			SimpleVector toCam;
+//			SimpleVector mushroomTranslation;
+//			for (int i = 0; i < mushrooms.length; i++) {
+//				mushroom = mushrooms[i];
+//				mushroomTranslation = mushroom.getTranslation();
+//				toCam = SimpleVector.create(mushroomTranslation);
+//				toCam.sub(camera.getPosition());
+//				if (toCam.length() < worldScale) {
+//					mushroom.translate(0, 0.2f, 0);
+//				}
+//			}
 
 			fb.clear(back);
 			world.renderScene(fb);
