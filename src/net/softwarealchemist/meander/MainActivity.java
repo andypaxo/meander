@@ -7,10 +7,8 @@ import java.lang.reflect.Field;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import net.softwarealchemist.meander.util.SystemUiHider;
 import android.app.Activity;
 import android.content.res.AssetManager;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
@@ -20,27 +18,18 @@ import android.view.MotionEvent;
 import android.view.Window;
 
 import com.threed.jpct.Camera;
-import com.threed.jpct.Config;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
 import com.threed.jpct.TextureManager;
 import com.threed.jpct.World;
-import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- *
- * @see SystemUiHider
- */
 public class MainActivity extends Activity {    
     private static MainActivity master = null;
 
@@ -57,8 +46,6 @@ public class MainActivity extends Activity {
 	private float ypos = -1;
 	private float touchDrift = 0;
 
-	private int fps = 0;
-
 	private Light sun = null;
 	
 	private SimpleVector facing = new SimpleVector();
@@ -68,8 +55,6 @@ public class MainActivity extends Activity {
 	private Rect worldBounds;
 	private final int worldScale = 10;
 	private final int worldTiles = 32;
-	
-	private Object3D[] mushrooms;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +128,6 @@ public class MainActivity extends Activity {
 	}
     
     class MyRenderer implements GLSurfaceView.Renderer {
-
-		private long time = System.currentTimeMillis();
 		private float[][] heightMap;
 
 		public MyRenderer() {
@@ -172,8 +155,6 @@ public class MainActivity extends Activity {
 				sun.setPosition(sv);
 				
 				AssetManager assManager = getApplicationContext().getAssets();
-				Drawable textureImage;
-				Texture texture;
 				loadTexture(assManager, "textures/leaves.jpg", "texture");
 				loadTexture(assManager, "textures/rune-rock.png", "rune-rock");
 				loadTexture(assManager, "textures/gnarly-tree.png", "gnarly-tree");
@@ -212,24 +193,19 @@ public class MainActivity extends Activity {
 				terrain.build();
 				world.addObject(terrain);
 				
-				try {
-					Object3D model;
+				Object3D model;
 
-					model = loadModel(assManager, "rune-rock");
-					model.setTexture("rune-rock");
-					placeModel(model, 0, 20, 1);
+				model = loadModel(assManager, "rune-rock");
+				model.setTexture("rune-rock");
+				placeModel(model, 0, 20, 1);
 
-					model = loadModel(assManager, "gnarly-tree");
-					model.setTexture("gnarly-tree");
-					placeModel(model, 0, 30, 3);
-					
-					model = loadModel(assManager, "pine-tree");
-					model.setTexture("pine-tree");
-					placeModel(model, 0, 40, 4);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				model = loadModel(assManager, "gnarly-tree");
+				model.setTexture("gnarly-tree");
+				placeModel(model, 0, 30, 3);
+				
+				model = loadModel(assManager, "pine-tree");
+				model.setTexture("pine-tree");
+				placeModel(model, 0, 40, 4);
 				
 				for (String textureName : TextureManager.getInstance().getNames()) {
 					Log.d("meander", "Texture : " + textureName);
@@ -248,12 +224,17 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		private Object3D loadModel(AssetManager assManager, String modelName) throws IOException {
-			Object3D model;
-			InputStream objStream, mtlStream;
-			objStream= assManager.open("models/"+modelName+".obj");
-			mtlStream = assManager.open("models/"+modelName+".mtl");
-			model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+		private Object3D loadModel(AssetManager assManager, String modelName) {
+			Object3D model = null;
+			try {	
+				InputStream objStream, mtlStream;
+				objStream= assManager.open("models/"+modelName+".obj");
+				mtlStream = assManager.open("models/"+modelName+".mtl");
+				model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 			return model;
 		}
 
@@ -264,8 +245,8 @@ public class MainActivity extends Activity {
 				texture = new Texture(assManager.open(path), true);
 				TextureManager.getInstance().addTexture(textureName, texture);
 			} catch (IOException e) {
-				// TODO: handle exception
 				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 
@@ -320,32 +301,23 @@ public class MainActivity extends Activity {
 			position.y = getHeightAtPoint(position) - 2f;
 			camera.setPosition(position);
 			
-//			Object3D mushroom;
-//			SimpleVector toCam;
-//			SimpleVector mushroomTranslation;
-//			for (int i = 0; i < mushrooms.length; i++) {
-//				mushroom = mushrooms[i];
-//				mushroomTranslation = mushroom.getTranslation();
-//				toCam = SimpleVector.create(mushroomTranslation);
-//				toCam.sub(camera.getPosition());
-//				if (toCam.length() < worldScale) {
-//					mushroom.translate(0, 0.2f, 0);
-//				}
-//			}
-
 			fb.clear(back);
 			world.renderScene(fb);
 			world.draw(fb);
 			fb.display();
 
+		}
+
+//		private int fps = 0;
+//		private void logFps() {
 //			if (System.currentTimeMillis() - time >= 1000) {
 //				Logger.log(fps + "fps");
 //				fps = 0;
 //				time = System.currentTimeMillis();
 //			}
 //			fps++;
-		}
-
+//		}
+		
 		private float getHeightAtPoint(SimpleVector targetPosition) {
 			SimpleVector position = SimpleVector.create(targetPosition);
 			position.scalarMul(1f / worldScale);
@@ -362,18 +334,14 @@ public class MainActivity extends Activity {
 			return Math.max(min, Math.min(max, value));
 		}
 		
-//		private float lerp(float a, float b, float t) {
-//			return a + (b - a) * t;
-//		}
-		
 		float blerp(
-				   float tx, float ty, 
-				   float c00, float c10,
-				   float c01, float c11)
-				{
-				    float a = c00 * (1f - tx) + c10 * tx;
-				    float b = c01 * (1f - tx) + c11 * tx;
-				    return a * (1f - ty) + b * ty;
-				}
+			float tx, float ty, 
+			float c00, float c10,
+			float c01, float c11)
+		{
+		    float a = c00 * (1f - tx) + c10 * tx;
+		    float b = c01 * (1f - tx) + c11 * tx;
+		    return a * (1f - ty) + b * ty;
+		}
 	}
 }
