@@ -67,6 +67,7 @@ public class MainActivity extends Activity {
 	
 	private Rect worldBounds;
 	private final int worldScale = 10;
+	private final int worldTiles = 32;
 	
 	private Object3D[] mushrooms;
 	
@@ -161,9 +162,9 @@ public class MainActivity extends Activity {
 				world = new World();
 				world.setAmbientLight(100, 100, 130);
 				world.setFogging(World.FOGGING_ENABLED);
-				world.setFogParameters(20 * worldScale, 50, 50, 100);
-				worldBounds = new Rect(1 * worldScale, 1 * worldScale, 63 * worldScale, 63 * worldScale);
-				world.setClippingPlanes(1f, 20f * worldScale);
+				world.setFogParameters(10 * worldScale, 50, 50, 100);
+				worldBounds = new Rect(1 * worldScale, 1 * worldScale, (worldTiles - 2) * worldScale, (worldTiles - 2) * worldScale);
+				world.setClippingPlanes(1f, 10f * worldScale);
 
 				sun = new Light(world);
 				sun.setIntensity(250, 250, 250);
@@ -178,9 +179,8 @@ public class MainActivity extends Activity {
 				loadTexture(assManager, "textures/gnarly-tree.png", "gnarly-tree");
 				loadTexture(assManager, "textures/pine-tree.png", "pine-tree");
 				
-
 				HeightMapGenerator generator = new HeightMapGenerator();
-				heightMap = generator.generate(0, 0, 64, 64, 0.03f);
+				heightMap = generator.generate(0, 0, worldTiles, worldTiles, 0.03f);
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
@@ -188,10 +188,10 @@ public class MainActivity extends Activity {
 					}
 				}
 
-				Object3D terrain = new Object3D(64 * 64 * 2);				
+				Object3D terrain = new Object3D(worldTiles * worldTiles * 2);				
 				int x, z, s = worldScale;
-				for (int i = 0; i < 62; i++)
-					for (int j = 0; j < 62; j++) {
+				for (int i = 0; i < worldTiles - 1; i++)
+					for (int j = 0; j < worldTiles - 1; j++) {
 						x = i * s;
 						z = j * s;
 						terrain.addTriangle(
@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
 
 					model = loadModel(assManager, "rune-rock");
 					model.setTexture("rune-rock");
-					placeModel(model, 0, 40, 1);
+					placeModel(model, 0, 20, 1);
 
 					model = loadModel(assManager, "gnarly-tree");
 					model.setTexture("gnarly-tree");
@@ -309,7 +309,7 @@ public class MainActivity extends Activity {
 			}
 
 			if (isWalking)
-				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
+				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.3f);
 			
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
