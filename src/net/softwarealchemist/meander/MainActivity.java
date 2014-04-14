@@ -180,7 +180,11 @@ public class MainActivity extends Activity {
 				loadTexture(assManager, "textures/pine-tree.png", "pine-tree");
 				
 				HeightMapGenerator generator = new HeightMapGenerator();
-				heightMap = generator.generate(0, 0, worldTiles, worldTiles, 0.03f);
+				final double maxOffset = 2048;
+				final int 
+					xOffset = (int) (Math.random() * maxOffset * 2 - maxOffset),
+					yOffset = (int) (Math.random() * maxOffset * 2 - maxOffset);
+				heightMap = generator.generate(xOffset, yOffset, worldTiles, worldTiles, 0.03f);
 				for (int i = 0; i < heightMap.length; i++) {
 					float[] row = heightMap[i];
 					for (int j = 0; j < row.length; j++) {
@@ -231,10 +235,9 @@ public class MainActivity extends Activity {
 					Log.d("meander", "Texture : " + textureName);
 				}
 				
-				
 				Camera camera = world.getCamera();
-				camera.setPosition(20, -5, 20);
-				camera.lookAt(SimpleVector.create(worldBounds.exactCenterX(), 0, worldBounds.exactCenterY()));
+				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
+				camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -5, worldBounds.centerY()));
 				
 				MemoryHelper.compact();
 
@@ -309,7 +312,7 @@ public class MainActivity extends Activity {
 			}
 
 			if (isWalking)
-				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.3f);
+				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
 			
 			SimpleVector position = camera.getPosition();
 			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
