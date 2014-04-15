@@ -139,6 +139,11 @@ public class MainActivity extends Activity {
 			}
 			fb = new FrameBuffer(gl, w, h);
 			Log.d("meander", "Using GLES v" + fb.getOpenGLMajorVersion());
+			
+			gl.glEnable(GL10.GL_BLEND);
+			gl.glEnable(GL10.GL_ALPHA_TEST);
+			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glAlphaFunc(GL10.GL_GREATER, 0.5f);
 
 			if (master == null) {
 
@@ -155,10 +160,6 @@ public class MainActivity extends Activity {
 				sun.setPosition(sv);
 				
 				AssetManager assManager = getApplicationContext().getAssets();
-				loadTexture(assManager, "textures/leaves.jpg", "texture");
-				loadTexture(assManager, "textures/rune-rock.png", "rune-rock");
-				loadTexture(assManager, "textures/gnarly-tree.png", "gnarly-tree");
-				loadTexture(assManager, "textures/pine-tree.png", "pine-tree");
 				
 				HeightMapGenerator generator = new HeightMapGenerator();
 				final double maxOffset = 2048;
@@ -188,28 +189,26 @@ public class MainActivity extends Activity {
 								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
 								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
 					}
-				terrain.setTexture("texture");
+				
+				loadTexture(assManager, "leaves");
+				terrain.setTexture("leaves");
 				terrain.strip();
 				terrain.build();
 				world.addObject(terrain);
 				
 				Object3D model;
 
-				model = loadModel(assManager, "rune-rock");
-				model.setTexture("rune-rock");
+				model = loadModelWithTexture(assManager, "rune-rock");
 				placeModel(model, 0, 20, 1);
 
-				model = loadModel(assManager, "gnarly-tree");
-				model.setTexture("gnarly-tree");
+				model = loadModelWithTexture(assManager, "gnarly-tree");
 				placeModel(model, 0, 30, 3);
-				
-				model = loadModel(assManager, "pine-tree");
-				model.setTexture("pine-tree");
+
+				model = loadModelWithTexture(assManager, "pine-tree");
 				placeModel(model, 0, 40, 4);
 				
-				for (String textureName : TextureManager.getInstance().getNames()) {
-					Log.d("meander", "Texture : " + textureName);
-				}
+				model = loadModelWithTexture(assManager, "tower");
+				placeModel(model, 0, 15, 1);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
@@ -222,6 +221,14 @@ public class MainActivity extends Activity {
 					master = MainActivity.this;
 				}
 			}
+		}
+
+		private Object3D loadModelWithTexture(AssetManager assManager, String modelName) {
+			Object3D model;
+			loadTexture(assManager, modelName);
+			model = loadModel(assManager, modelName);
+			model.setTexture(modelName);
+			return model;
 		}
 
 		private Object3D loadModel(AssetManager assManager, String modelName) {
@@ -240,9 +247,10 @@ public class MainActivity extends Activity {
 
 		Drawable textureImage;
 		Texture texture;
-		private void loadTexture(AssetManager assManager, String path, String textureName) {
+		private void loadTexture(AssetManager assManager, String textureName) {
 			try {
-				texture = new Texture(assManager.open(path), true);
+				texture = new Texture(assManager.open("textures/"+textureName+".png"), true);
+				texture.setFiltering(false);
 				TextureManager.getInstance().addTexture(textureName, texture);
 			} catch (IOException e) {
 				e.printStackTrace();
