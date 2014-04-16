@@ -321,9 +321,12 @@ public class MainActivity extends Activity {
 		}
 
 		long lastCall = 0, thisCall;
-		SimpleVector camPreviousPosition = SimpleVector.create();
+		SimpleVector camPosition = SimpleVector.create();
 		SimpleVector camDirection = SimpleVector.create();
 		final float walkSpeed = 5f;
+		final float playerSize = 2.5f;
+		final float playerR = playerSize / 2f;
+		BoundingBox camBox = new BoundingBox();
 		private void doMovement() {
 			Camera camera = world.getCamera();
 			
@@ -335,7 +338,7 @@ public class MainActivity extends Activity {
 			}
 
 			// Translation
-			camera.getPosition(camPreviousPosition);
+			camera.getPosition(camPosition);
 			thisCall = System.currentTimeMillis();
 			if (isWalking && lastCall > 0) {
 				float dTime = (thisCall - lastCall) / 1000f; 
@@ -344,8 +347,49 @@ public class MainActivity extends Activity {
 				camDirection.normalize();
 				camDirection.scalarMul(walkSpeed * dTime);
 				
-				camPreviousPosition.add(camDirection);
-				camera.setPosition(camPreviousPosition);
+				BoundingBox boxToTest;
+				
+				camPosition.x += camDirection.x;
+				camBox.set(camPosition, playerSize);
+				if (camDirection.x > 0) {
+					for (int i = 0; i < solidBoundingBoxes.size(); i++) {
+						boxToTest = solidBoundingBoxes.get(i);
+						if (boxToTest.intersects(camBox)) {
+							camPosition.x = boxToTest.left - playerR - 0.01f;
+							camBox.set(camPosition, playerSize);
+						}
+					}
+				} else {
+					for (int i = 0; i < solidBoundingBoxes.size(); i++) {
+						boxToTest = solidBoundingBoxes.get(i);
+						if (boxToTest.intersects(camBox)) {
+							camPosition.x = boxToTest.right + playerR + 0.01f;
+							camBox.set(camPosition, playerSize);
+						}
+					}
+				}
+				
+				camPosition.z += camDirection.z;
+				camBox.set(camPosition, playerSize);
+				if (camDirection.z > 0) {
+					for (int i = 0; i < solidBoundingBoxes.size(); i++) {
+						boxToTest = solidBoundingBoxes.get(i);
+						if (boxToTest.intersects(camBox)) {
+							camPosition.z = boxToTest.top - playerR - 0.01f;
+							camBox.set(camPosition, playerSize);
+						}
+					}
+				} else {
+					for (int i = 0; i < solidBoundingBoxes.size(); i++) {
+						boxToTest = solidBoundingBoxes.get(i);
+						if (boxToTest.intersects(camBox)) {
+							camPosition.z = boxToTest.bottom + playerR + 0.01f;
+							camBox.set(camPosition, playerSize);
+						}
+					}
+				}
+				
+				camera.setPosition(camPosition);
 			}
 			lastCall = thisCall;
 			
