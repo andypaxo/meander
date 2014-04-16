@@ -204,13 +204,13 @@ public class MainActivity extends Activity {
 				Object3D model;
 
 				model = loadModelWithTexture(assManager, "rune-rock");
-				placeModel(model, 20, 1, true);
+				addBoundingBoxes(placeModel(model, 20, 1, true), 2);
 
 				model = loadModelWithTexture(assManager, "gnarly-tree");
-				placeModel(model, 30, 3, true);
+				addBoundingBoxes(placeModel(model, 30, 3, true), 1.5f);
 
 				model = loadModelWithTexture(assManager, "pine-tree");
-				placeModel(model, 40, 4, true);
+				addBoundingBoxes(placeModel(model, 40, 4, true), 1.5f);
 				
 				model = loadModelWithTexture(assManager, "tower");
 				addBoundingBoxes(placeModel(model, 15, 1, false), 4);
