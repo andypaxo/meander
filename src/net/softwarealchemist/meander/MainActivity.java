@@ -3,10 +3,13 @@ package net.softwarealchemist.meander;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import net.softwarealchemist.meander.util.*;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Rect;
@@ -55,6 +58,8 @@ public class MainActivity extends Activity {
 	private Rect worldBounds;
 	private final int worldScale = 10;
 	private final int worldTiles = 32;
+	
+	private List<BoundingBox> solidBoundingBoxes = new ArrayList<BoundingBox>();
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,7 +213,7 @@ public class MainActivity extends Activity {
 				placeModel(model, 40, 4, true);
 				
 				model = loadModelWithTexture(assManager, "tower");
-				placeModel(model, 15, 1, false);
+				addBoundingBoxes(placeModel(model, 15, 1, false), 4);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
@@ -220,6 +225,19 @@ public class MainActivity extends Activity {
 					Logger.log("Saving master Activity!");
 					master = MainActivity.this;
 				}
+			}
+		}
+
+		private void addBoundingBoxes(Object3D[] models, float size) {
+			float r = size / 2f;
+			SimpleVector translation;
+			for (int i = 0; i < models.length; i++) {
+				translation = models[i].getTranslation();
+				solidBoundingBoxes.add(new BoundingBox(
+						translation.x - r,
+						translation.z - r,
+						size,
+						size));
 			}
 		}
 
@@ -293,28 +311,53 @@ public class MainActivity extends Activity {
 		}
 
 		public void onDrawFrame(GL10 gl) {
-			Camera camera = world.getCamera();
-			
-			camera.rotateAxis(camera.getYAxis(), touchTurn);
-			if ((touchTurnUp > 0 && xAngle < Math.PI / 4.2) || (touchTurnUp < 0 && xAngle > -Math.PI / 4.2)) {
-				camera.rotateX(touchTurnUp);
-				xAngle += touchTurnUp;
-			}
-
-			if (isWalking)
-				camera.moveCamera(Camera.CAMERA_MOVEIN, 0.1f);
-			
-			SimpleVector position = camera.getPosition();
-			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
-			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
-			position.y = getHeightAtPoint(position) - 2f;
-			camera.setPosition(position);
+			doMovement();
 			
 			fb.clear(back);
 			world.renderScene(fb);
 			world.draw(fb);
 			fb.display();
 
+		}
+
+		long lastCall = 0, thisCall;
+		SimpleVector camPreviousPosition = SimpleVector.create();
+		SimpleVector camDirection = SimpleVector.create();
+		final float walkSpeed = 5f;
+		private void doMovement() {
+			Camera camera = world.getCamera();
+			
+			// Rotation
+			camera.rotateAxis(camera.getYAxis(), touchTurn);
+			if ((touchTurnUp > 0 && xAngle < Math.PI / 4.2) || (touchTurnUp < 0 && xAngle > -Math.PI / 4.2)) {
+				camera.rotateX(touchTurnUp);
+				xAngle += touchTurnUp;
+			}
+
+			// Translation
+			camera.getPosition(camPreviousPosition);
+			thisCall = System.currentTimeMillis();
+			if (isWalking && lastCall > 0) {
+				float dTime = (thisCall - lastCall) / 1000f; 
+				camera.getDirection(camDirection);
+				camDirection.y = 0;
+				camDirection.normalize();
+				camDirection.scalarMul(walkSpeed * dTime);
+				
+				camPreviousPosition.add(camDirection);
+				camera.setPosition(camPreviousPosition);
+			}
+			lastCall = thisCall;
+			
+			// Keep to bounds
+			SimpleVector position = camera.getPosition();
+			position.x = clamp(position.x, worldBounds.left, worldBounds.right);
+			position.z = clamp(position.z, worldBounds.top, worldBounds.bottom);
+			
+			// Stick to floor
+			position.y = getHeightAtPoint(position) - 2f;
+			
+			camera.setPosition(position);
 		}
 
 //		private int fps = 0;
