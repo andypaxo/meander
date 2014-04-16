@@ -199,16 +199,16 @@ public class MainActivity extends Activity {
 				Object3D model;
 
 				model = loadModelWithTexture(assManager, "rune-rock");
-				placeModel(model, 0, 20, 1);
+				placeModel(model, 20, 1, true);
 
 				model = loadModelWithTexture(assManager, "gnarly-tree");
-				placeModel(model, 0, 30, 3);
+				placeModel(model, 30, 3, true);
 
 				model = loadModelWithTexture(assManager, "pine-tree");
-				placeModel(model, 0, 40, 4);
+				placeModel(model, 40, 4, true);
 				
 				model = loadModelWithTexture(assManager, "tower");
-				placeModel(model, 0, 15, 1);
+				placeModel(model, 15, 1, false);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
@@ -258,7 +258,7 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		private Object3D[] placeModel(Object3D model, float offset, int numClumps, int clumpSize) {
+		private Object3D[] placeModel(Object3D model, int numClumps, int clumpSize, boolean rotate) {
 			Object3D[] result = new Object3D[numClumps * clumpSize];
 			SimpleVector instancePosition = new SimpleVector();
 			final int clumpRadius = 1 * worldScale;
@@ -274,10 +274,11 @@ public class MainActivity extends Activity {
 					instancePosition.set(position);
 					instancePosition.x += ((float)Math.random() - 0.5) * clumpRadius * 2;
 					instancePosition.z += ((float)Math.random() - 0.5) * clumpRadius * 2;
-					instancePosition.y = getHeightAtPoint(instancePosition) + offset;
+					instancePosition.y = getHeightAtPoint(instancePosition);
 					
 					Object3D instance = model.cloneObject();
-					instance.rotateY((float) (Math.random() * 2.0 * Math.PI));
+					if (rotate)
+						instance.rotateY((float) (Math.random() * 2.0 * Math.PI));
 					instance.translate(instancePosition);
 					instance.strip();
 					instance.build();
