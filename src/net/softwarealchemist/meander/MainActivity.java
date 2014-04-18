@@ -2,18 +2,19 @@ package net.softwarealchemist.meander;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import net.softwarealchemist.meander.util.*;
+import net.softwarealchemist.meander.util.BoundingBox;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +25,6 @@ import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Loader;
-import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
     }
     
     private void create3DStuffs() {
-		mGLView = new GLSurfaceView(getApplication());
+		mGLView = new MySurfaceView(getApplication());
 		renderer = new MyRenderer();
 		mGLView.setRenderer(renderer);
 		setContentView(mGLView);
@@ -112,6 +112,15 @@ public class MainActivity extends Activity {
 
 		return super.onTouchEvent(me);
 	}
+	
+	class MySurfaceView extends GLSurfaceView {
+
+		public MySurfaceView(Context context) {
+			super(context);
+			setEGLContextClientVersion(2);
+		}
+		
+	}
     
     class MyRenderer implements GLSurfaceView.Renderer {
 		private float[][] heightMap;
@@ -119,17 +128,16 @@ public class MainActivity extends Activity {
 		public MyRenderer() {
 		}
 
-		public void onSurfaceChanged(GL10 gl, int w, int h) {
-			if (fb != null) {
+		public void onSurfaceChanged(GL10 unused, int w, int h) {
+			if (fb != null)
 				fb.dispose();
-			}
-			fb = new FrameBuffer(gl, w, h);
+			fb = new FrameBuffer(w, h);
 			Log.d("meander", "Using GLES v" + fb.getOpenGLMajorVersion());
 			
-			gl.glEnable(GL10.GL_BLEND);
-			gl.glEnable(GL10.GL_ALPHA_TEST);
-			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-			gl.glAlphaFunc(GL10.GL_GREATER, 0.01f);
+			GLES20.glEnable(GL10.GL_BLEND);
+			GLES20.glEnable(GL10.GL_ALPHA_TEST);
+			GLES20.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+			// GLES20.glAlphaFunc(GL10.GL_GREATER, 0.01f);
 
 			if (world != null)
 				return;
