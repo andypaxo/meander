@@ -1,5 +1,7 @@
 package net.softwarealchemist.meander.util;
 
+import android.graphics.Rect;
+
 import com.threed.jpct.SimpleVector;
 
 public class BoundingBox {
@@ -41,6 +43,16 @@ public class BoundingBox {
 	public String toString() {
 		return "(" + top + "," + left + ") -> (" + bottom + ", " + right + ")"; 
 	}
-	
-	
+
+	public float centerX() {
+		return (left + right) / 2f;
+	}
+
+	public float centerY() {
+		return (top + bottom) / 2f;
+	}
+
+	public Rect toRect() {
+		return new Rect((int)left, (int)top, (int)right, (int)bottom);
+	}
 }
