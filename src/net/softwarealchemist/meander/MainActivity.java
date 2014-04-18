@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
@@ -65,6 +67,13 @@ public class MainActivity extends Activity {
     }
     
     private void create3DStuffs() {
+    	if (mGLView != null)
+    		return;
+    	
+    	Tracker tracker = ((MeanderApp)getApplication()).getTracker();
+    	tracker.setScreenName("Main Activity");
+    	tracker.send(new HitBuilders.AppViewBuilder().build());
+    	
 		mGLView = new GLSurfaceView(getApplication());
 		renderer = new MyRenderer();
 		mGLView.setRenderer(renderer);
@@ -236,8 +245,7 @@ public class MainActivity extends Activity {
 				mtlStream = assManager.open("models/"+modelName+".mtl");
 				model = Loader.loadOBJ(objStream, mtlStream, 1)[0];
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
+				throw new RuntimeException(e);
 			}
 			return model;
 		}
@@ -250,8 +258,7 @@ public class MainActivity extends Activity {
 				texture.setFiltering(false);
 				TextureManager.getInstance().addTexture(textureName, texture);
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
+				throw new RuntimeException(e);
 			}
 		}
 
