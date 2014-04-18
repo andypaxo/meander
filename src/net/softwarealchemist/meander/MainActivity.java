@@ -148,7 +148,7 @@ public class MainActivity extends Activity {
 			gl.glEnable(GL10.GL_BLEND);
 			gl.glEnable(GL10.GL_ALPHA_TEST);
 			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-			gl.glAlphaFunc(GL10.GL_GREATER, 0.5f);
+			gl.glAlphaFunc(GL10.GL_GREATER, 0.01f);
 
 			if (master == null) {
 
@@ -204,16 +204,19 @@ public class MainActivity extends Activity {
 				Object3D model;
 
 				model = loadModelWithTexture(assManager, "rune-rock");
-				addBoundingBoxes(placeModel(model, 20, 1, true), 2);
+				addBoundingBoxes(placeModel(model, 10, 1, true), 2);
 
 				model = loadModelWithTexture(assManager, "gnarly-tree");
-				addBoundingBoxes(placeModel(model, 30, 3, true), 1.5f);
+				addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f);
 
 				model = loadModelWithTexture(assManager, "pine-tree");
-				addBoundingBoxes(placeModel(model, 40, 4, true), 1.5f);
-				
+				addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f);
+
 				model = loadModelWithTexture(assManager, "tower");
-				addBoundingBoxes(placeModel(model, 15, 1, false), 4);
+				addBoundingBoxes(placeModel(model, 10, 1, false), 4);
+				
+				model = loadModelWithTexture(assManager, "mill");
+				addBoundingBoxes(placeModel(model, 6, 1, false), 6);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
