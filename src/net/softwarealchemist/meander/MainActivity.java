@@ -204,19 +204,19 @@ public class MainActivity extends Activity {
 				Object3D model;
 
 				model = loadModelWithTexture(assManager, "rune-rock");
-				addBoundingBoxes(placeModel(model, 10, 1, true), 2);
+				addBoundingBoxes(placeModel(model, 10, 1, true), 2, 2);
 
 				model = loadModelWithTexture(assManager, "gnarly-tree");
-				addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f);
+				addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f, 1.5f);
 
 				model = loadModelWithTexture(assManager, "pine-tree");
-				addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f);
+				addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f, 1.5f);
 
 				model = loadModelWithTexture(assManager, "tower");
-				addBoundingBoxes(placeModel(model, 10, 1, false), 4);
+				addBoundingBoxes(placeModel(model, 10, 1, false), 4, 4);
 				
 				model = loadModelWithTexture(assManager, "mill");
-				addBoundingBoxes(placeModel(model, 6, 1, false), 6);
+				addBoundingBoxes(placeModel(model, 6, 1, false), 10, 6);
 				
 				Camera camera = world.getCamera();
 				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
@@ -231,16 +231,17 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		private void addBoundingBoxes(Object3D[] models, float size) {
-			float r = size / 2f;
+		private void addBoundingBoxes(Object3D[] models, float width, float depth) {
+			float rX = width / 2f;
+			float rZ = depth / 2f;
 			SimpleVector translation;
 			for (int i = 0; i < models.length; i++) {
 				translation = models[i].getTranslation();
 				solidBoundingBoxes.add(new BoundingBox(
-						translation.x - r,
-						translation.z - r,
-						size,
-						size));
+						translation.x - rX,
+						translation.z - rZ,
+						width,
+						depth));
 			}
 		}
 
