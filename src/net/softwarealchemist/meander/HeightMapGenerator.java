@@ -1,6 +1,4 @@
 package net.softwarealchemist.meander;
-import java.util.Arrays;
-
 import android.util.Log;
 
 public class HeightMapGenerator {
@@ -47,9 +45,10 @@ public class HeightMapGenerator {
        private static final float F2 = (float) (0.5f*(Math.sqrt(3.0f)-1.0f));
        private static final float G2 = (float) ((3.0f-Math.sqrt(3.0f))/6.0f);
        
-       private static Grad grad3[] = {new Grad(1,1,0),new Grad(-1,1,0),new Grad(1,-1,0),new Grad(-1,-1,0),
-           new Grad(1,0,1),new Grad(-1,0,1),new Grad(1,0,-1),new Grad(-1,0,-1),
-           new Grad(0,1,1),new Grad(0,-1,1),new Grad(0,1,-1),new Grad(0,-1,-1)};
+       private static Grad grad3[] = {
+    	   new Grad(1,1),new Grad(-1,1),new Grad(1,-1),new Grad(-1,-1),
+           new Grad(1,0),new Grad(-1,0),new Grad(1,0),new Grad(-1,0),
+           new Grad(0,1),new Grad(0,-1),new Grad(0,1),new Grad(0,-1)};
        
        // This method is a *lot* faster than using (int)Math.floor(x)
        private static int fastfloor(float x) {
@@ -119,21 +118,12 @@ public class HeightMapGenerator {
        // (array access is a lot slower than member access)
        private static class Grad
        {
-         float x, y, z, w;
+         float x, y;
 
-         Grad(float x, float y, float z)
+         Grad(float x, float y)
          {
            this.x = x;
            this.y = y;
-           this.z = z;
-         }
-
-         Grad(float x, float y, float z, float w)
-         {
-           this.x = x;
-           this.y = y;
-           this.z = z;
-           this.w = w;
          }
        }
 

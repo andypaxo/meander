@@ -2,14 +2,13 @@ package net.softwarealchemist.meander;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import net.softwarealchemist.meander.util.*;
+import net.softwarealchemist.meander.util.BoundingBox;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Rect;
@@ -24,7 +23,6 @@ import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Loader;
-import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
