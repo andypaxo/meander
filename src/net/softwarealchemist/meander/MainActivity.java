@@ -34,8 +34,6 @@ import com.threed.jpct.World;
 import com.threed.jpct.util.MemoryHelper;
 
 public class MainActivity extends Activity {    
-    private static MainActivity master = null;
-
 	private GLSurfaceView mGLView;
 	private MyRenderer renderer = null;
 	private FrameBuffer fb = null;
@@ -69,29 +67,12 @@ public class MainActivity extends Activity {
     }
     
     private void create3DStuffs() {
-    	if (master != null) {
-			copy(master);
-		}
-    	
 		mGLView = new GLSurfaceView(getApplication());
 		renderer = new MyRenderer();
 		mGLView.setRenderer(renderer);
 		setContentView(mGLView);
     }
     
-    private void copy(Object src) {
-		try {
-			Logger.log("Copying data from master Activity!");
-			Field[] fs = src.getClass().getDeclaredFields();
-			for (Field f : fs) {
-				f.setAccessible(true);
-				f.set(this, f.get(src));
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public boolean onTouchEvent(MotionEvent me) {
 
 		if (me.getAction() == MotionEvent.ACTION_DOWN) {
@@ -150,86 +131,81 @@ public class MainActivity extends Activity {
 			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 			gl.glAlphaFunc(GL10.GL_GREATER, 0.01f);
 
-			if (master == null) {
+			if (world != null)
+				return;
+			
+			world = new World();
+			world.setAmbientLight(100, 100, 130);
+			world.setFogging(World.FOGGING_ENABLED);
+			world.setFogParameters(10 * worldScale, 50, 50, 100);
+			worldBounds = new Rect(1 * worldScale, 1 * worldScale, (worldTiles - 2) * worldScale, (worldTiles - 2) * worldScale);
+			world.setClippingPlanes(1f, 10f * worldScale);
 
-				world = new World();
-				world.setAmbientLight(100, 100, 130);
-				world.setFogging(World.FOGGING_ENABLED);
-				world.setFogParameters(10 * worldScale, 50, 50, 100);
-				worldBounds = new Rect(1 * worldScale, 1 * worldScale, (worldTiles - 2) * worldScale, (worldTiles - 2) * worldScale);
-				world.setClippingPlanes(1f, 10f * worldScale);
-
-				sun = new Light(world);
-				sun.setIntensity(250, 250, 250);
-				SimpleVector sv = new SimpleVector(-50, -200, -30);
-				sun.setPosition(sv);
-				
-				AssetManager assManager = getApplicationContext().getAssets();
-				
-				HeightMapGenerator generator = new HeightMapGenerator();
-				final double maxOffset = 2048;
-				final int 
-					xOffset = (int) (Math.random() * maxOffset * 2 - maxOffset),
-					yOffset = (int) (Math.random() * maxOffset * 2 - maxOffset);
-				heightMap = generator.generate(xOffset, yOffset, worldTiles, worldTiles, 0.03f);
-				for (int i = 0; i < heightMap.length; i++) {
-					float[] row = heightMap[i];
-					for (int j = 0; j < row.length; j++) {
-						row[j] *= -30f;
-					}
-				}
-
-				Object3D terrain = new Object3D(worldTiles * worldTiles * 2);				
-				int x, z, s = worldScale;
-				float texScale = 1f / (worldTiles - 1);
-				for (int i = 0; i < worldTiles - 1; i++)
-					for (int j = 0; j < worldTiles - 1; j++) {
-						x = i * s;
-						z = j * s;
-						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
-								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) * texScale, (j+0) * texScale,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
-						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) * texScale, (j+1) * texScale,
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
-					}
-				
-				loadTexture(assManager, "ground");
-				terrain.setTexture("ground");
-				terrain.strip();
-				terrain.build();
-				world.addObject(terrain);
-				
-				Object3D model;
-
-				model = loadModelWithTexture(assManager, "rune-rock");
-				addBoundingBoxes(placeModel(model, 10, 1, true), 2, 2);
-
-				model = loadModelWithTexture(assManager, "gnarly-tree");
-				addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f, 1.5f);
-
-				model = loadModelWithTexture(assManager, "pine-tree");
-				addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f, 1.5f);
-
-				model = loadModelWithTexture(assManager, "tower");
-				addBoundingBoxes(placeModel(model, 10, 1, false), 4, 4);
-				
-				model = loadModelWithTexture(assManager, "mill");
-				addBoundingBoxes(placeModel(model, 6, 1, false), 10, 6);
-				
-				Camera camera = world.getCamera();
-				camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
-				camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -5, worldBounds.centerY()));
-				
-				MemoryHelper.compact();
-
-				if (master == null) {
-					Logger.log("Saving master Activity!");
-					master = MainActivity.this;
+			sun = new Light(world);
+			sun.setIntensity(250, 250, 250);
+			SimpleVector sv = new SimpleVector(-50, -200, -30);
+			sun.setPosition(sv);
+			
+			AssetManager assManager = getApplicationContext().getAssets();
+			
+			HeightMapGenerator generator = new HeightMapGenerator();
+			final double maxOffset = 2048;
+			final int 
+				xOffset = (int) (Math.random() * maxOffset * 2 - maxOffset),
+				yOffset = (int) (Math.random() * maxOffset * 2 - maxOffset);
+			heightMap = generator.generate(xOffset, yOffset, worldTiles, worldTiles, 0.03f);
+			for (int i = 0; i < heightMap.length; i++) {
+				float[] row = heightMap[i];
+				for (int j = 0; j < row.length; j++) {
+					row[j] *= -30f;
 				}
 			}
+
+			Object3D terrain = new Object3D(worldTiles * worldTiles * 2);				
+			int x, z, s = worldScale;
+			float texScale = 1f / (worldTiles - 1);
+			for (int i = 0; i < worldTiles - 1; i++)
+				for (int j = 0; j < worldTiles - 1; j++) {
+					x = i * s;
+					z = j * s;
+					terrain.addTriangle(
+							SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
+							SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) * texScale, (j+0) * texScale,
+							SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
+					terrain.addTriangle(
+							SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) * texScale, (j+1) * texScale,
+							SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
+							SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
+				}
+			
+			loadTexture(assManager, "ground");
+			terrain.setTexture("ground");
+			terrain.strip();
+			terrain.build();
+			world.addObject(terrain);
+			
+			Object3D model;
+
+			model = loadModelWithTexture(assManager, "rune-rock");
+			addBoundingBoxes(placeModel(model, 10, 1, true), 2, 2);
+
+			model = loadModelWithTexture(assManager, "gnarly-tree");
+			addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f, 1.5f);
+
+			model = loadModelWithTexture(assManager, "pine-tree");
+			addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f, 1.5f);
+
+			model = loadModelWithTexture(assManager, "tower");
+			addBoundingBoxes(placeModel(model, 10, 1, false), 4, 4);
+			
+			model = loadModelWithTexture(assManager, "mill");
+			addBoundingBoxes(placeModel(model, 6, 1, false), 10, 6);
+			
+			Camera camera = world.getCamera();
+			camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
+			camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -5, worldBounds.centerY()));
+			
+			MemoryHelper.compact();
 		}
 
 		private void addBoundingBoxes(Object3D[] models, float width, float depth) {
