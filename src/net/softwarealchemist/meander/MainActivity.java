@@ -181,22 +181,23 @@ public class MainActivity extends Activity {
 
 				Object3D terrain = new Object3D(worldTiles * worldTiles * 2);				
 				int x, z, s = worldScale;
+				float texScale = 1f / (worldTiles - 1);
 				for (int i = 0; i < worldTiles - 1; i++)
 					for (int j = 0; j < worldTiles - 1; j++) {
 						x = i * s;
 						z = j * s;
 						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
-								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) / 8f, (j+0) / 8f,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
+								SimpleVector.create(x+s, heightMap[i+1][j  ], z  ), (i+1) * texScale, (j+0) * texScale,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
 						terrain.addTriangle(
-								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) / 8f, (j+1) / 8f,
-								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) / 8f, (j+0) / 8f,
-								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) / 8f, (j+1) / 8f);
+								SimpleVector.create(x  , heightMap[i  ][j+1], z+s), (i+0) * texScale, (j+1) * texScale,
+								SimpleVector.create(x  , heightMap[i  ][j  ], z  ), (i+0) * texScale, (j+0) * texScale,
+								SimpleVector.create(x+s, heightMap[i+1][j+1], z+s), (i+1) * texScale, (j+1) * texScale);
 					}
 				
-				loadTexture(assManager, "leaves");
-				terrain.setTexture("leaves");
+				loadTexture(assManager, "ground");
+				terrain.setTexture("ground");
 				terrain.strip();
 				terrain.build();
 				world.addObject(terrain);
