@@ -23,6 +23,7 @@ public class PlayerController {
 	private final float walkSpeed = 5f;
 	private final float playerSize = 2.5f;
 	private final float playerR = playerSize / 2f;
+	private final float playerHeight = 2f;
 
 	long lastCall = 0, thisCall;
 	
@@ -134,8 +135,7 @@ public class PlayerController {
 		position.x = MathUtil.clamp(position.x, worldBounds.left, worldBounds.right);
 		position.z = MathUtil.clamp(position.z, worldBounds.top, worldBounds.bottom);
 		
-		// Stick to floor
-		position.y = zone.getHeightAtPoint(position) - 2f;
+		position.y = zone.getHeightAtPoint(position) - playerHeight;
 		
 		camera.setPosition(position);
 		
