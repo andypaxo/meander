@@ -23,7 +23,7 @@ public class PlayerController {
 	private final float walkSpeed = 5f;
 	private final float playerSize = 2.5f;
 	private final float playerR = playerSize / 2f;
-	private final float playerHeight = 2f;
+	private final float playerHeight = 6f;
 
 	long lastCall = 0, thisCall;
 	
