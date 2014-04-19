@@ -3,7 +3,7 @@ package net.softwarealchemist.meander;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import net.softwarealchemist.meander.zones.HinterlandZone;
+import net.softwarealchemist.meander.zones.*;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
@@ -35,7 +35,7 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 		gl.glAlphaFunc(GL10.GL_GREATER, 0.01f);
 
 		if (currentZone == null) {
-			currentZone = new HinterlandZone();
+			currentZone = new CabinZone();
 			currentZone.build(resManager);
 		}
 		

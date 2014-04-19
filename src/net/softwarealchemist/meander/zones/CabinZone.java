@@ -13,7 +13,7 @@ public class CabinZone extends Zone {
 
 	@Override
 	protected void buildWorld(ResourceManager resManager) {
-		worldBounds = new BoundingBox(-14.75f, -14.75f, 29.5f, 29.5f);
+		worldBounds = new BoundingBox(-48, -48, 96, 96);
 		
 		
 		Object3D room = resManager.loadModelWithTexture("cabin_room_1");
@@ -31,7 +31,7 @@ public class CabinZone extends Zone {
 		world.addObject(room);
 		
 		Light light = new Light(world);
-		light.setPosition(SimpleVector.create(-20, -30, -8));
+		light.setPosition(SimpleVector.create(-200, -150, -80));
 
 		placeCamera();
 	}
