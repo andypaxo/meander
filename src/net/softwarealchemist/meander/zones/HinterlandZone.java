@@ -1,6 +1,5 @@
 package net.softwarealchemist.meander.zones;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.softwarealchemist.meander.HeightMapGenerator;
@@ -18,25 +17,18 @@ import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
 
-public class HinterlandZone implements Zone {
-
-	private World world = null;
+public class HinterlandZone extends Zone {
 	private Light sun = null;
-	private RGBColor back = new RGBColor(50, 50, 100);
 	
 	private float[][] heightMap;
-	private BoundingBox worldBounds;
 	private final int worldScale = 10;
 	private final int worldTiles = 32;
 	
-	private List<BoundingBox> solidBoundingBoxes = new ArrayList<BoundingBox>();
 		
 	@Override
-	public void build(ResourceManager resManager) {
-		if (world != null)
-			return;
+	protected void buildWorld(ResourceManager resManager) {
+		back = new RGBColor(50, 50, 100);
 		
-		world = new World();
 		world.setAmbientLight(100, 100, 130);
 		world.setFogging(World.FOGGING_ENABLED);
 		world.setFogParameters(10 * worldScale, 50, 50, 100);
