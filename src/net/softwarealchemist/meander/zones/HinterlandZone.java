@@ -21,7 +21,7 @@ public class HinterlandZone extends Zone {
 	private Light sun = null;
 	
 	private float[][] heightMap;
-	private final int worldScale = 10;
+	private final int worldScale = 100;
 	private final int worldTiles = 32;
 	
 		
@@ -33,7 +33,7 @@ public class HinterlandZone extends Zone {
 		world.setFogging(World.FOGGING_ENABLED);
 		world.setFogParameters(10 * worldScale, 50, 50, 100);
 		worldBounds = new BoundingBox(1 * worldScale, 1 * worldScale, (worldTiles - 2) * worldScale, (worldTiles - 2) * worldScale);
-		world.setClippingPlanes(1f, 10f * worldScale);
+		world.setClippingPlanes(2.5f, 10f * worldScale);
 
 		sun = new Light(world);
 		sun.setIntensity(250, 250, 250);
@@ -49,7 +49,7 @@ public class HinterlandZone extends Zone {
 		for (int i = 0; i < heightMap.length; i++) {
 			float[] row = heightMap[i];
 			for (int j = 0; j < row.length; j++) {
-				row[j] *= -30f;
+				row[j] *= -300f;
 			}
 		}
 
@@ -79,19 +79,19 @@ public class HinterlandZone extends Zone {
 		Object3D model;
 
 		model = resManager.loadModelWithTexture("rune-rock");
-		addBoundingBoxes(placeModel(model, 10, 1, true), 2, 2);
+		addBoundingBoxes(placeModel(model, 10, 1, true), 20, 20);
 
 		model = resManager.loadModelWithTexture("gnarly-tree");
-		addBoundingBoxes(placeModel(model, 20, 3, true), 1.5f, 1.5f);
+		addBoundingBoxes(placeModel(model, 20, 3, true), 15f, 15f);
 
 		model = resManager.loadModelWithTexture("pine-tree");
-		addBoundingBoxes(placeModel(model, 30, 4, true), 1.5f, 1.5f);
+		addBoundingBoxes(placeModel(model, 30, 4, true), 15f, 15f);
 
 		model = resManager.loadModelWithTexture("tower");
-		addBoundingBoxes(placeModel(model, 10, 1, false), 4, 4);
+		addBoundingBoxes(placeModel(model, 10, 1, false), 40, 40);
 		
 		model = resManager.loadModelWithTexture("mill");
-		addBoundingBoxes(placeModel(model, 6, 1, false), 10, 6);
+		addBoundingBoxes(placeModel(model, 6, 1, false), 100, 60);
 		
 		placeCamera();
 	}

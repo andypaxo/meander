@@ -20,10 +20,10 @@ public class PlayerController {
 	private float touchDrift = 0;
 	private boolean isWalking;
 
-	private final float walkSpeed = 5f;
-	private final float playerSize = 2.5f;
+	private final float walkSpeed = 50f;
+	private final float playerSize = 6f;
 	private final float playerR = playerSize / 2f;
-	private final float playerHeight = 6f;
+	private final float playerHeight = 20f;
 
 	long lastCall = 0, thisCall;
 	
