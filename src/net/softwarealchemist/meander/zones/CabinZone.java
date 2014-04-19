@@ -1,33 +1,30 @@
 package net.softwarealchemist.meander.zones;
 
-import com.threed.jpct.Camera;
-import com.threed.jpct.Light;
-import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
-import com.threed.jpct.SimpleVector;
-
 import net.softwarealchemist.meander.ResourceManager;
 import net.softwarealchemist.meander.Zone;
 import net.softwarealchemist.meander.util.BoundingBox;
+
+import com.threed.jpct.Camera;
+import com.threed.jpct.Light;
+import com.threed.jpct.Object3D;
+import com.threed.jpct.SimpleVector;
 
 public class CabinZone extends Zone {
 
 	@Override
 	protected void buildWorld(ResourceManager resManager) {
-		worldBounds = new BoundingBox(-16, -16, 32, 32);
+		worldBounds = new BoundingBox(-14.75f, -14.75f, 29.5f, 29.5f);
 		
-		resManager.loadTexture("planks");
 		
-		Object3D room = new Object3D(2);
-		room.addTriangle(
-			SimpleVector.create(-16, 0, -16), 0, 0,
-			SimpleVector.create( 16, 0, -16), 1, 0,
-			SimpleVector.create( 16, 0,  16), 1, 1);
-		room.addTriangle(
-			SimpleVector.create(-16, 0,  16), 0, 1,
-			SimpleVector.create(-16, 0, -16), 0, 0,
-			SimpleVector.create( 16, 0,  16), 1, 1);
-		room.setTexture("planks");
+		Object3D room = resManager.loadModelWithTexture("cabin_room_1");
+//		room.addTriangle(
+//			SimpleVector.create(-16, 0, -16), 0, 0,
+//			SimpleVector.create( 16, 0, -16), 1, 0,
+//			SimpleVector.create( 16, 0,  16), 1, 1);
+//		room.addTriangle(
+//			SimpleVector.create(-16, 0,  16), 0, 1,
+//			SimpleVector.create(-16, 0, -16), 0, 0,
+//			SimpleVector.create( 16, 0,  16), 1, 1);
 		room.strip();
 		room.build();
 		
