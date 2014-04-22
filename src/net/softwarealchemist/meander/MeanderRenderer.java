@@ -1,5 +1,7 @@
 package net.softwarealchemist.meander;
 
+import java.util.Hashtable;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -16,6 +18,7 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 	private Zone currentZone;
 	private PlayerController controller;
 	private ResourceManager resManager;
+	private Hashtable<String, Class<?>> zoneTypes;
 
 	public MeanderRenderer(PlayerController controller, ResourceManager resManager) {
 		this.controller = controller;
@@ -36,8 +39,12 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 
 		if (currentZone == null) {
 			currentZone = new CabinZone();
-			currentZone.build(resManager);
+			currentZone.build(resManager, this);
 		}
+		
+		zoneTypes = new Hashtable<String, Class<?>>();
+		zoneTypes.put("hinterland", HinterlandZone.class);
+		zoneTypes.put("cabin", CabinZone.class);
 		
 		MemoryHelper.compact();
 	}
@@ -48,5 +55,16 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 	public void onDrawFrame(GL10 gl) {
 		controller.doMovement(currentZone);
 		currentZone.renderInto(fb);
+	}
+
+	public void changeZone(String zoneName) {
+		Class<?> newZoneType = zoneTypes.get(zoneName);
+		try {
+			final Zone newZone = (Zone) newZoneType.newInstance();
+			newZone.build(resManager, this);
+			currentZone = newZone;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

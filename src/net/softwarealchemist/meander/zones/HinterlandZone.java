@@ -3,6 +3,7 @@ package net.softwarealchemist.meander.zones;
 import java.util.List;
 
 import net.softwarealchemist.meander.HeightMapGenerator;
+import net.softwarealchemist.meander.MeanderRenderer;
 import net.softwarealchemist.meander.ResourceManager;
 import net.softwarealchemist.meander.Zone;
 import net.softwarealchemist.meander.util.BoundingBox;
@@ -26,7 +27,7 @@ public class HinterlandZone extends Zone {
 	
 		
 	@Override
-	protected void buildWorld(ResourceManager resManager) {
+	protected void buildWorld(ResourceManager resManager, MeanderRenderer renderer) {
 		back = new RGBColor(50, 50, 100);
 		
 		world.setAmbientLight(100, 100, 130);

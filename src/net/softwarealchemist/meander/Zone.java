@@ -20,14 +20,14 @@ public abstract class Zone {
 	protected BoundingBox worldBounds;
 	protected RGBColor back;
 	
-	public void build(ResourceManager resManager) {
+	public void build(ResourceManager resManager, MeanderRenderer renderer) {
 		if (world == null) {
 			 world = new World();
-			buildWorld(resManager);
+			buildWorld(resManager, renderer);
 		}
 	}
 	
-	protected abstract void buildWorld(ResourceManager resManager);
+	protected abstract void buildWorld(ResourceManager resManager, MeanderRenderer renderer);
 	
 	public abstract float getHeightAtPoint(SimpleVector position);
 
