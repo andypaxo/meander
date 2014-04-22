@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.softwarealchemist.meander.util.BoundingBox;
 import net.softwarealchemist.meander.util.MathUtil;
+import net.softwarealchemist.meander.util.TriggerArea;
 
 import com.threed.jpct.Camera;
 import com.threed.jpct.SimpleVector;
@@ -75,71 +76,30 @@ public class PlayerController {
 		startUpdate();
 		
 		Camera camera = zone.getCamera();
-		List<BoundingBox> boundingBoxes = zone.getSolidBoundingBoxes();
-		BoundingBox worldBounds = zone.getBounds();
 		
 		rotate(camera);
-		
-		// Translation
-		camera.getPosition(camPosition);
-		camera.getDirection(camDirection);
-		
-		if (updateDirection(camDirection)) {
-			BoundingBox boxToTest;
-			
-			camPosition.x += camDirection.x;
-			camBox.set(camPosition, playerSize);
-			if (camDirection.x > 0) {
-				for (int i = 0; i < boundingBoxes.size(); i++) {
-					boxToTest = boundingBoxes.get(i);
-					if (boxToTest.intersects(camBox)) {
-						camPosition.x = boxToTest.left - playerR - 0.01f;
-						camBox.set(camPosition, playerSize);
-					}
-				}
-			} else {
-				for (int i = 0; i < boundingBoxes.size(); i++) {
-					boxToTest = boundingBoxes.get(i);
-					if (boxToTest.intersects(camBox)) {
-						camPosition.x = boxToTest.right + playerR + 0.01f;
-						camBox.set(camPosition, playerSize);
-					}
-				}
-			}
-			
-			camPosition.z += camDirection.z;
-			camBox.set(camPosition, playerSize);
-			if (camDirection.z > 0) {
-				for (int i = 0; i < boundingBoxes.size(); i++) {
-					boxToTest = boundingBoxes.get(i);
-					if (boxToTest.intersects(camBox)) {
-						camPosition.z = boxToTest.top - playerR - 0.01f;
-						camBox.set(camPosition, playerSize);
-					}
-				}
-			} else {
-				for (int i = 0; i < boundingBoxes.size(); i++) {
-					boxToTest = boundingBoxes.get(i);
-					if (boxToTest.intersects(camBox)) {
-						camPosition.z = boxToTest.bottom + playerR + 0.01f;
-						camBox.set(camPosition, playerSize);
-					}
-				}
-			}
-			
-			camera.setPosition(camPosition);
-		}
+		move(camera, zone.getSolidBoundingBoxes());
+		activateTriggers(camera, zone.getTriggerAreas());
 		
 		// Keep to bounds
 		SimpleVector position = camera.getPosition();
+		BoundingBox worldBounds = zone.getBounds();
+
 		position.x = MathUtil.clamp(position.x, worldBounds.left, worldBounds.right);
 		position.z = MathUtil.clamp(position.z, worldBounds.top, worldBounds.bottom);
-		
 		position.y = zone.getHeightAtPoint(position) - playerHeight;
 		
 		camera.setPosition(position);
 		
 		endUpdate();
+	}
+	
+	public void rotate(Camera camera) {
+		camera.rotateAxis(camera.getYAxis(), touchTurn);
+		if ((touchTurnUp > 0 && xAngle < Math.PI / 4.2) || (touchTurnUp < 0 && xAngle > -Math.PI / 4.2)) {
+			camera.rotateX(touchTurnUp);
+			xAngle += touchTurnUp;
+		}
 	}
 
 	public void startUpdate() {
@@ -149,12 +109,68 @@ public class PlayerController {
 	public void endUpdate() {
 		lastCall = thisCall;
 	}
-	
-	public void rotate(Camera camera) {
-		camera.rotateAxis(camera.getYAxis(), touchTurn);
-		if ((touchTurnUp > 0 && xAngle < Math.PI / 4.2) || (touchTurnUp < 0 && xAngle > -Math.PI / 4.2)) {
-			camera.rotateX(touchTurnUp);
-			xAngle += touchTurnUp;
+
+	private void move(Camera camera, List<BoundingBox> boundingBoxes) {
+		camera.getPosition(camPosition);
+		camera.getDirection(camDirection);
+		
+		if (!updateDirection(camDirection))
+			return;
+		
+		BoundingBox boxToTest;
+		
+		camPosition.x += camDirection.x;
+		camBox.set(camPosition, playerSize);
+		if (camDirection.x > 0) {
+			for (int i = 0; i < boundingBoxes.size(); i++) {
+				boxToTest = boundingBoxes.get(i);
+				if (boxToTest.intersects(camBox)) {
+					camPosition.x = boxToTest.left - playerR - 0.01f;
+					camBox.set(camPosition, playerSize);
+				}
+			}
+		} else {
+			for (int i = 0; i < boundingBoxes.size(); i++) {
+				boxToTest = boundingBoxes.get(i);
+				if (boxToTest.intersects(camBox)) {
+					camPosition.x = boxToTest.right + playerR + 0.01f;
+					camBox.set(camPosition, playerSize);
+				}
+			}
+		}
+		
+		camPosition.z += camDirection.z;
+		camBox.set(camPosition, playerSize);
+		if (camDirection.z > 0) {
+			for (int i = 0; i < boundingBoxes.size(); i++) {
+				boxToTest = boundingBoxes.get(i);
+				if (boxToTest.intersects(camBox)) {
+					camPosition.z = boxToTest.top - playerR - 0.01f;
+					camBox.set(camPosition, playerSize);
+				}
+			}
+		} else {
+			for (int i = 0; i < boundingBoxes.size(); i++) {
+				boxToTest = boundingBoxes.get(i);
+				if (boxToTest.intersects(camBox)) {
+					camPosition.z = boxToTest.bottom + playerR + 0.01f;
+					camBox.set(camPosition, playerSize);
+				}
+			}
+		}
+		
+		camera.setPosition(camPosition);
+	}
+
+	private void activateTriggers(Camera camera, List<TriggerArea> triggerAreas) {
+		final float cameraX = camera.getPosition().x;
+		final float cameraZ = camera.getPosition().z;
+		TriggerArea area;
+		
+		for (int i = 0; i < triggerAreas.size(); i++) {
+			area = triggerAreas.get(i);
+			if (area.area.contains(cameraX, cameraZ))
+				area.doAction();
 		}
 	}
 
