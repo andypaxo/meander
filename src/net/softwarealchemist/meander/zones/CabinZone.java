@@ -17,14 +17,6 @@ public class CabinZone extends Zone {
 		
 		
 		Object3D room = resManager.loadModelWithTexture("cabin_room_1");
-//		room.addTriangle(
-//			SimpleVector.create(-16, 0, -16), 0, 0,
-//			SimpleVector.create( 16, 0, -16), 1, 0,
-//			SimpleVector.create( 16, 0,  16), 1, 1);
-//		room.addTriangle(
-//			SimpleVector.create(-16, 0,  16), 0, 1,
-//			SimpleVector.create(-16, 0, -16), 0, 0,
-//			SimpleVector.create( 16, 0,  16), 1, 1);
 		room.strip();
 		room.build();
 		
@@ -38,8 +30,8 @@ public class CabinZone extends Zone {
 
 	private void placeCamera() {
 		Camera camera = world.getCamera();
-		camera.setPosition(worldBounds.centerX(), -5, worldBounds.centerY());
-		camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -5, worldBounds.centerY()));
+		camera.setPosition(0, -20, -40);
+		camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -20, worldBounds.centerY()));
 	}
 
 	@Override

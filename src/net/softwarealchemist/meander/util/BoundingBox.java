@@ -38,6 +38,10 @@ public class BoundingBox {
 		         top > other.bottom ||
 		         bottom < other.top);
 	}
+	
+	public boolean contains(float x, float y) {
+		return x > left && x < right && y > top && y < bottom;
+	}
 
 	@Override
 	public String toString() {
