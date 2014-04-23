@@ -8,6 +8,7 @@ import net.softwarealchemist.meander.util.TriggerArea;
 
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
+import com.threed.jpct.Object3D;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
@@ -57,6 +58,10 @@ public abstract class Zone {
 	
 	public World getWorld() {
 		return world;
+	}
+
+	public void dispose() {
+		world.dispose();
 	}
 	
 }

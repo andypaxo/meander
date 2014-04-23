@@ -104,6 +104,8 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 		try {
 			final Zone newZone = (Zone) newZoneType.newInstance();
 			newZone.build(resManager, this);
+			if (currentZone != null)
+				currentZone.dispose();
 			currentZone = newZone;
 			
 			createVeil();
