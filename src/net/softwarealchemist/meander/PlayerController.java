@@ -33,7 +33,12 @@ public class PlayerController {
 	private final SimpleVector camDirection = SimpleVector.create();
 	private final BoundingBox camBox = new BoundingBox();
 	
+	private boolean isActive = true;
+	
 	public boolean onTouchEvent(MotionEvent me) {
+		if (!isActive)
+			return false;
+		
 		if (me.getAction() == MotionEvent.ACTION_DOWN) {
 			xpos = me.getX();
 			ypos = me.getY();
@@ -74,6 +79,11 @@ public class PlayerController {
 	
 	public void doMovement(Zone zone) {
 		startUpdate();
+
+		if (!isActive) {
+			endUpdate();
+			return;
+		}
 		
 		Camera camera = zone.getCamera();
 		
@@ -187,5 +197,13 @@ public class PlayerController {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

@@ -14,6 +14,7 @@ import com.threed.jpct.World;
 
 public abstract class Zone {
 	protected World world;
+
 	protected List<BoundingBox> solidBoundingBoxes = new ArrayList<BoundingBox>();
 	protected List<TriggerArea> triggerAreas = new ArrayList<TriggerArea>();
 
@@ -52,6 +53,10 @@ public abstract class Zone {
 
 	public BoundingBox getBounds() {
 		return worldBounds;
+	}
+	
+	public World getWorld() {
+		return world;
 	}
 	
 }

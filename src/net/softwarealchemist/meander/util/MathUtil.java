@@ -15,5 +15,9 @@ public class MathUtil {
 	    float b = c01 * (1f - tx) + c11 * tx;
 	    return a * (1f - ty) + b * ty;
 	}
+	
+	public static float lerp(float a, float b, float t) {
+		return a + (b - a) * t;
+	}
 
 }

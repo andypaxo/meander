@@ -25,7 +25,7 @@ public class CabinZone extends Zone {
 		
 		Light light = new Light(world);
 		light.setPosition(SimpleVector.create(-200, -150, -80));
-
+		
 		placeCamera();
 		
 		triggerAreas.add(new ChangeZoneTrigger(
