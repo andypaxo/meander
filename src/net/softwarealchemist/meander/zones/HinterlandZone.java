@@ -94,13 +94,19 @@ public class HinterlandZone extends Zone {
 		addBoundingBoxes(placeModel(model, 30, 4, true), 15f, 15f);
 
 		model = resManager.loadModelWithTexture("tower");
-		addZoneTriggers(addBoundingBoxes(placeModel(model, 6, 1, false), 40, 40));
+		addBoundingBoxes(placeModel(model, 6, 1, false), 40, 40);
 		
 		model = resManager.loadModelWithTexture("mill");
 		addBoundingBoxes(placeModel(model, 4, 1, false), 100, 60);
 		
 		model = resManager.loadModelWithTexture("church");
-		placeModel(model, 6, 1, false);
+		addZoneTriggers(addBoundingBoxes(
+				placeModel(model, 6, 1, false),
+				new int [] {
+					-70, -50, 70, 30,
+					-70, 20, 70, 30,
+					-50, -20, 50, 40
+				}));
 		
 		placeCamera();
 	}
@@ -126,12 +132,26 @@ public class HinterlandZone extends Zone {
 		return models;
 	}
 
+	private Object3D[] addBoundingBoxes(Object3D[] models, int[] rects) {
+		SimpleVector translation;
+		for (int i = 0; i < models.length; i++) {
+			translation = models[i].getTranslation();
+			for (int rectIndex = 0; rectIndex < rects.length; )
+				solidBoundingBoxes.add(new BoundingBox(
+						translation.x + rects[rectIndex++],
+						translation.z + rects[rectIndex++],
+						rects[rectIndex++],
+						rects[rectIndex++]));
+		}
+		return models;
+	}
+
 	private void addZoneTriggers(Object3D[] models) {
 		SimpleVector translation;
 		for (int i = 0; i < models.length; i++) {
 			translation = models[i].getTranslation();
 			triggerAreas.add(new ChangeZoneTrigger(
-					new BoundingBox(translation.x - 42, translation.z - 10, 84, 20),
+					new BoundingBox(translation.x - 55, translation.z - 20, 10, 40),
 					renderer, "cabin"));
 		}
 	}
