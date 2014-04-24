@@ -94,10 +94,13 @@ public class HinterlandZone extends Zone {
 		addBoundingBoxes(placeModel(model, 30, 4, true), 15f, 15f);
 
 		model = resManager.loadModelWithTexture("tower");
-		addZoneTriggers(addBoundingBoxes(placeModel(model, 10, 1, false), 40, 40));
+		addZoneTriggers(addBoundingBoxes(placeModel(model, 6, 1, false), 40, 40));
 		
 		model = resManager.loadModelWithTexture("mill");
-		addBoundingBoxes(placeModel(model, 6, 1, false), 100, 60);
+		addBoundingBoxes(placeModel(model, 4, 1, false), 100, 60);
+		
+		model = resManager.loadModelWithTexture("church");
+		placeModel(model, 6, 1, false);
 		
 		placeCamera();
 	}
