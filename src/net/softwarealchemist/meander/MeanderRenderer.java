@@ -75,9 +75,6 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 		if (isFading) {
 			float t = (float) ((System.currentTimeMillis() - fadeStartTime) / (fadeEndTime - fadeStartTime));
 			final int veilAlpha = (int) (MathUtil.lerp(startAlpha, targetAlpha, t) * 16f);
-			Log.d("Meander", "Veil duration set to " + (fadeEndTime - fadeStartTime) / 1000);
-			Log.d("Meander", "Veil delta " + t);
-			Log.d("Meander", "Veil alpha set to " + veilAlpha);
 			veil.setTransparency( veilAlpha );
 		}
 		

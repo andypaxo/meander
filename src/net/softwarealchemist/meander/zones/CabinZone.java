@@ -29,15 +29,15 @@ public class CabinZone extends Zone {
 		placeCamera();
 		
 		triggerAreas.add(new ChangeZoneTrigger(
-				new BoundingBox(40, 40, 10, 10),
+				new BoundingBox(-8, -46, 10, 16),
 				renderer,
 				"hinterland"));
 	}
 
 	private void placeCamera() {
 		Camera camera = world.getCamera();
-		camera.setPosition(0, -20, -40);
-		camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -20, worldBounds.centerY()));
+		camera.setPosition(0, -20, 46);
+		camera.lookAt(SimpleVector.create(0, -20, 0));
 	}
 
 	@Override
