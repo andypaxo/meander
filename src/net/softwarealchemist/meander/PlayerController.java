@@ -205,5 +205,7 @@ public class PlayerController {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+		if (!isActive)
+			isWalking = false;
 	}
 }

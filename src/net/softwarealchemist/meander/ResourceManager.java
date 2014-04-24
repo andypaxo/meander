@@ -39,10 +39,14 @@ public class ResourceManager {
 	}
 
 	public void loadTexture(String textureName) {
+		final TextureManager texManager = TextureManager.getInstance();
+		if (texManager.containsTexture(textureName))
+			return;
+		
 		try {
 			Texture texture = new Texture(assManager.open("textures/"+textureName+".png"), true);
 			texture.setFiltering(false);
-			TextureManager.getInstance().addTexture(textureName, texture);
+			texManager.addTexture(textureName, texture);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

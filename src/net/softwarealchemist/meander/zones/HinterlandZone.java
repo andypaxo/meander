@@ -2,6 +2,7 @@ package net.softwarealchemist.meander.zones;
 
 import java.util.List;
 
+import net.softwarealchemist.meander.ChangeZoneTrigger;
 import net.softwarealchemist.meander.HeightMapGenerator;
 import net.softwarealchemist.meander.MeanderRenderer;
 import net.softwarealchemist.meander.ResourceManager;
@@ -24,10 +25,14 @@ public class HinterlandZone extends Zone {
 	private float[][] heightMap;
 	private final int worldScale = 100;
 	private final int worldTiles = 32;
+
+	private MeanderRenderer renderer;
 	
 		
 	@Override
 	protected void buildWorld(ResourceManager resManager, MeanderRenderer renderer) {
+		this.renderer = renderer;
+		
 		back = new RGBColor(50, 50, 100);
 		
 		world.setAmbientLight(100, 100, 130);
@@ -89,7 +94,7 @@ public class HinterlandZone extends Zone {
 		addBoundingBoxes(placeModel(model, 30, 4, true), 15f, 15f);
 
 		model = resManager.loadModelWithTexture("tower");
-		addBoundingBoxes(placeModel(model, 10, 1, false), 40, 40);
+		addZoneTriggers(addBoundingBoxes(placeModel(model, 10, 1, false), 40, 40));
 		
 		model = resManager.loadModelWithTexture("mill");
 		addBoundingBoxes(placeModel(model, 6, 1, false), 100, 60);
@@ -103,7 +108,7 @@ public class HinterlandZone extends Zone {
 		camera.lookAt(SimpleVector.create(worldBounds.centerX() + 1, -5, worldBounds.centerY()));
 	}
 
-	private void addBoundingBoxes(Object3D[] models, float width, float depth) {
+	private Object3D[] addBoundingBoxes(Object3D[] models, float width, float depth) {
 		float rX = width / 2f;
 		float rZ = depth / 2f;
 		SimpleVector translation;
@@ -114,6 +119,17 @@ public class HinterlandZone extends Zone {
 					translation.z - rZ,
 					width,
 					depth));
+		}
+		return models;
+	}
+
+	private void addZoneTriggers(Object3D[] models) {
+		SimpleVector translation;
+		for (int i = 0; i < models.length; i++) {
+			translation = models[i].getTranslation();
+			triggerAreas.add(new ChangeZoneTrigger(
+					new BoundingBox(translation.x - 42, translation.z - 10, 84, 20),
+					renderer, "cabin"));
 		}
 	}
 

@@ -59,7 +59,7 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 			veilTexture = new Texture(16, 16);
 			TextureManager.getInstance().addTexture("veil", veilTexture);
 			
-			loadZone("cabin");
+			loadZone("hinterland");
 		}
 		
 		MemoryHelper.compact();
