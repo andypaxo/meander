@@ -39,7 +39,6 @@ public class HinterlandZone extends Zone {
 		world.setFogging(World.FOGGING_ENABLED);
 		world.setFogParameters(10 * worldScale, 50, 50, 100);
 		worldBounds = new BoundingBox(1 * worldScale, 1 * worldScale, (worldTiles - 2) * worldScale, (worldTiles - 2) * worldScale);
-		world.setClippingPlanes(2.5f, 10f * worldScale);
 
 		sun = new Light(world);
 		sun.setIntensity(250, 250, 250);
