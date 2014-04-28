@@ -57,7 +57,10 @@ public class MeanderRenderer implements GLSurfaceView.Renderer
 			zoneTypes.put("cabin", CabinZone.class);
 			
 			veilTexture = new Texture(16, 16);
-			TextureManager.getInstance().addTexture("veil", veilTexture);
+			final TextureManager textureManager = TextureManager.getInstance();
+			if (!textureManager.containsTexture("veil")) {
+				textureManager.addTexture("veil", veilTexture);
+			}
 			
 			loadZone("hinterland");
 		}
